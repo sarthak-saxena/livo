@@ -64,7 +64,7 @@ export const joinConference = async (
     const conference = await VoxeetSdk.conference.fetch(conferenceId);
     console.log(
       "conference join link",
-      `http://localhost:3000/?conferenceId=${conferenceId}`
+      `${window.location.origin}/?conferenceId=${conferenceId}`
     );
     return await VoxeetSdk.conference.join(conference, joinOptions);
   } catch (e) {
