@@ -3,4 +3,4 @@ import { ConferenceMode } from "./src/types/App";
 import { Attendee, Room } from "./src/types/Conference";
 import { VoxeetConfig } from "./src/types/Voxeet";
 export { Livo, ConferenceMode };
-export type { Attendee, Room, VoxeetConfig };
+export { Attendee, Room, VoxeetConfig };
