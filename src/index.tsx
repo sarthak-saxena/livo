@@ -1,14 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { ConferenceMode } from "./types/App";
+import { SampleAttendee, SampleRoom } from "./testConfig/config";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App
+      voxeetConfig={{
+        consumerKey: "nw5wqOFjDuzrHbTsQXJj6Q==",
+        consumerSecret: "u1dXQWADNBbQ44jdg4Skl_Jc3Xw82JGDEDq6zGBTxc0=",
+      }}
+      attendee={SampleAttendee}
+      room={SampleRoom}
+      mode={ConferenceMode.AudioConference}
+    />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

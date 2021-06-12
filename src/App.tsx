@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import {
+  createMuiTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from "@material-ui/core/styles";
+import { ConferenceMode } from "./types/App";
+import { VoxeetConfig } from "./types/Voxeet";
+import { initializeVoxeet, purgeVoxeet } from "./core/voxeet/sdk";
+import { Attendee, Room } from "./types/Conference";
+import ConferenceContainer from "./layout/conference/ConferenceContainer";
+import { VoxeetContext } from "./services/context/voxeetContext";
+import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+let Theme = createMuiTheme();
+Theme = responsiveFontSizes(Theme);
+
+interface Props {
+  mode: ConferenceMode;
+  voxeetConfig: VoxeetConfig;
+  attendee: Attendee;
+  room: Room;
 }
+
+const App = ({ mode, voxeetConfig, attendee, room }: Props) => {
+  const [conference, setConference] = useState(
+    undefined as Conference | undefined
+  );
+  useEffect(() => {
+    initializeVoxeet(voxeetConfig, attendee, room).then((conference) => {
+      conference && setConference(conference);
+    });
+  }, [voxeetConfig, attendee, room]);
+
+  return (
+    <>
+      {conference && (
+        <ThemeProvider theme={Theme}>
+          <VoxeetContext.Provider value={{ conference }}>
+            <ConferenceContainer mode={mode} />
+          </VoxeetContext.Provider>
+        </ThemeProvider>
+      )}
+    </>
+  );
+};
 
 export default App;
