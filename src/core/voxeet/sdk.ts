@@ -3,6 +3,7 @@ import { VoxeetConfig } from "../../types/Voxeet";
 import { Attendee, Room } from "../../types/Conference";
 import { JoinOptions } from "@voxeet/voxeet-web-sdk/types/models/Options";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
+import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 
 export const initializeVoxeet = async (
   config: VoxeetConfig,
@@ -70,4 +71,17 @@ export const joinConference = async (
   } catch (e) {
     throw new Error(e);
   }
+};
+
+export const toggleMuteSelfAttendee = () => {
+  const a = VoxeetSdk;
+  debugger;
+  VoxeetSdk.conference.mute(
+    VoxeetSdk.session.participant,
+    !VoxeetSdk.conference.isMuted()
+  );
+};
+
+export const muteAttendee = (participant: Participant, isMuted: boolean) => {
+  VoxeetSdk.conference.mute(participant, isMuted);
 };

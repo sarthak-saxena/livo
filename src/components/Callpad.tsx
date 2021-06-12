@@ -4,7 +4,7 @@ import CallEndIcon from "@material-ui/icons/CallEnd";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { purgeVoxeet } from "../core/voxeet/sdk";
+import { toggleMuteSelfAttendee, purgeVoxeet } from "../core/voxeet/sdk";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -27,6 +27,7 @@ const CallPad = () => {
   const classes = useStyles();
   const [isMikeMute, muteMike] = useState(false);
   const muteMikeCallback = useCallback(() => {
+    toggleMuteSelfAttendee();
     muteMike(!isMikeMute);
   }, [isMikeMute]);
   const Icon = isMikeMute ? MicOffIcon : MicIcon;
