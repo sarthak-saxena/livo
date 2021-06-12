@@ -4,7 +4,7 @@
   "private": true,
   "main": "lib/index.js",
   "files": [
-	"build"
+    "build"
   ],
   "dependencies": {
     "@material-ui/core": "^4.11.4",
@@ -22,11 +22,11 @@
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
-	"babel-cli": "^6.6.5",
-	"@testing-library/jest-dom": "^5.11.4",
-	"@testing-library/react": "^11.1.0",
-	"@testing-library/user-event": "^12.1.10",
-	"@types/jest": "^26.0.15"
+    "babel-cli": "^6.6.5",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,8 +34,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier": "prettier --write '{src,test}/**/*.{js,ts,less,css,tsx,jsx}'",
-	"build-lib": "tsc -p libtsConfig.json && find ./src -exec rsync -R '{}' lib/ \\; && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files",
-	"postinstall": "yarn run build-lib"
+    "build-lib": "tsc -p libtsConfig.json && find ./src -exec rsync -R '{}' lib/ \\; && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files",
+    "postinstall": "yarn run build-lib"
   },
   "eslintConfig": {
     "extends": [
