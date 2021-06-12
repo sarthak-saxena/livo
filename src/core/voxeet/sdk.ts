@@ -74,8 +74,6 @@ export const joinConference = async (
 };
 
 export const toggleMuteSelfAttendee = () => {
-  const a = VoxeetSdk;
-  debugger;
   VoxeetSdk.conference.mute(
     VoxeetSdk.session.participant,
     !VoxeetSdk.conference.isMuted()
