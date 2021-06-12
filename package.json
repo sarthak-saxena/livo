@@ -2,7 +2,7 @@
   "name": "livo",
   "version": "0.1.0",
   "private": true,
-  "main": "lib/index.js",
+  "main": "index.js",
   "files": [
     "build"
   ],
