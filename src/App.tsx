@@ -22,7 +22,7 @@ interface Props {
   room: Room;
 }
 
-const App = ({ mode, voxeetConfig, attendee, room }: Props) => {
+export const App = ({ mode, voxeetConfig, attendee, room }: Props) => {
   const [conference, setConference] = useState(
     undefined as Conference | undefined
   );
@@ -44,5 +44,3 @@ const App = ({ mode, voxeetConfig, attendee, room }: Props) => {
     </>
   );
 };
-
-export default App;
