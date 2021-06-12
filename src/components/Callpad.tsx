@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from "react";
-import { makeStyles, Theme, Box, Grid } from "@material-ui/core";
+import { Box, Grid, makeStyles, Theme } from "@material-ui/core";
 import CallEndIcon from "@material-ui/icons/CallEnd";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import SettingsIcon from "@material-ui/icons/Settings";
-import VoxeetSdk from "@voxeet/voxeet-web-sdk";
 import { purgeVoxeet } from "../core/voxeet/sdk";
 
 const useStyles = makeStyles((theme: Theme) => ({

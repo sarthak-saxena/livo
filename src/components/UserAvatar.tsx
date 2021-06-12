@@ -36,6 +36,7 @@ interface Props {
 
 const UserAvatar = ({ attendee }: Props) => {
   const classes = useStyles();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMikeMute, muteMike] = useState(true);
 
   const Icon = isMikeMute ? MicOffIcon : MicIcon;

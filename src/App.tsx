@@ -6,7 +6,7 @@ import {
 } from "@material-ui/core/styles";
 import { ConferenceMode } from "./types/App";
 import { VoxeetConfig } from "./types/Voxeet";
-import { initializeVoxeet, purgeVoxeet } from "./core/voxeet/sdk";
+import { initializeVoxeet } from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
