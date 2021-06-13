@@ -9,7 +9,13 @@ export const useVoxeet: () => VoxeetContextType = () => {
   return useContext(VoxeetContext);
 };
 
-export const useVoxeetStreamAdded = (callback: any) => {
+export const useVoxeetStreamAdded = (
+  callback: (
+    participant: Participant,
+    stream: MediaStream,
+    event: VoxeetConferenceEvents
+  ) => void
+) => {
   useEffect(() => {
     const streamAddListener = (
       participant: Participant,
