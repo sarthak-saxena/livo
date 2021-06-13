@@ -15,7 +15,7 @@ import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
-import { useVoxeetStreamAdded } from "./services/hooks/voxeetHook";
+import { UserContext } from "./services/context/userContext";
 
 let Theme = createMuiTheme();
 Theme = responsiveFontSizes(Theme);
@@ -47,18 +47,19 @@ export const App = ({
     initializeVoxeet(voxeetConfig, attendee, room).then((conference) => {
       conference && setConference(conference);
     });
-    onAttendeeAdd && useVoxeetStreamAdded(onAttendeeAdd);
   }, [voxeetConfig, attendee, room]);
 
   return (
-    <>
-      {conference && (
-        <ThemeProvider theme={Theme}>
+    <ThemeProvider theme={Theme}>
+      <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
+        {conference ? (
           <VoxeetContext.Provider value={{ conference }}>
             <ConferenceContainer mode={mode} />
           </VoxeetContext.Provider>
-        </ThemeProvider>
-      )}
-    </>
+        ) : (
+          <></>
+        )}
+      </UserContext.Provider>
+    </ThemeProvider>
   );
 };

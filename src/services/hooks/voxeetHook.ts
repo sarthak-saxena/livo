@@ -9,12 +9,15 @@ export const useVoxeet: () => VoxeetContextType = () => {
   return useContext(VoxeetContext);
 };
 
+type StreamAddedCallback = (
+  participant: Participant,
+  stream: MediaStream,
+  event: VoxeetConferenceEvents
+) => void;
+
 export const useVoxeetStreamAdded = (
-  callback: (
-    participant: Participant,
-    stream: MediaStream,
-    event: VoxeetConferenceEvents
-  ) => void
+  callback: StreamAddedCallback,
+  onAttendeeAddCallback?: StreamAddedCallback
 ) => {
   useEffect(() => {
     const streamAddListener = (
@@ -22,6 +25,12 @@ export const useVoxeetStreamAdded = (
       stream: MediaStream
     ) => {
       callback(participant, stream, VoxeetConferenceEvents.StreamAdded);
+      onAttendeeAddCallback &&
+        onAttendeeAddCallback(
+          participant,
+          stream,
+          VoxeetConferenceEvents.StreamAdded
+        );
     };
 
     const streamRemoveListener = (
@@ -29,6 +38,12 @@ export const useVoxeetStreamAdded = (
       stream: MediaStream
     ) => {
       callback(participant, stream, VoxeetConferenceEvents.StreamRemoved);
+      onAttendeeAddCallback &&
+        onAttendeeAddCallback(
+          participant,
+          stream,
+          VoxeetConferenceEvents.StreamRemoved
+        );
     };
 
     conference.on(VoxeetConferenceEvents.StreamAdded, streamAddListener);

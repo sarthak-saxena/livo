@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { useVoxeet, useVoxeetStreamAdded } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetConferenceEvents } from "../types/Voxeet";
+import { useAttendee } from "../services/hooks/userHook";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,9 +46,10 @@ const useAttendeeAddCallback = (
 const UserAvatarContainer = () => {
   const classes = useStyles();
   const { conference } = useVoxeet();
+  const { onAttendeeAdd } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
   const onAttendeeAddCallback = useAttendeeAddCallback(attendees, setAttendees);
-  useVoxeetStreamAdded(onAttendeeAddCallback);
+  useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
 
   useEffect(() => {
     const attendees = Array.from(
