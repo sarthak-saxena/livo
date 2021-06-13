@@ -10,7 +10,6 @@ export interface UserContextType {
   attendee?: Attendee;
   onAttendeeAdd?: (
     participant: VoxeetAttendee,
-    stream: MediaStream,
     event: VoxeetConferenceEvents
   ) => void;
 }

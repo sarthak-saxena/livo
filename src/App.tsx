@@ -27,9 +27,10 @@ interface Props {
   room: Room;
   onAttendeeAdd?: (
     participant: VoxeetAttendee,
-    stream: MediaStream,
     event: VoxeetConferenceEvents
   ) => void;
+  onAppInitializedSuccessCallback?: (conference: Conference) => void;
+  onAppInitializedErrorCallback?: (e: Error) => void;
 }
 
 export const App = ({
@@ -38,15 +39,25 @@ export const App = ({
   attendee,
   room,
   onAttendeeAdd,
+  onAppInitializedSuccessCallback,
+  onAppInitializedErrorCallback,
 }: Props) => {
   const [conference, setConference] = useState(
     undefined as Conference | undefined
   );
 
   useEffect(() => {
-    initializeVoxeet(voxeetConfig, attendee, room).then((conference) => {
-      conference && setConference(conference);
-    });
+    initializeVoxeet(voxeetConfig, attendee, room)
+      .then((conference) => {
+        if (conference) {
+          setConference(conference);
+          onAppInitializedSuccessCallback &&
+            onAppInitializedSuccessCallback(conference);
+        }
+      })
+      .catch((error) => {
+        onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
+      });
   }, [voxeetConfig, attendee, room]);
 
   return (

@@ -17,7 +17,10 @@ type StreamAddedCallback = (
 
 export const useVoxeetStreamAdded = (
   callback: StreamAddedCallback,
-  onAttendeeAddCallback?: StreamAddedCallback
+  onAttendeeAddCallback?: (
+    participant: Participant,
+    event: VoxeetConferenceEvents
+  ) => void
 ) => {
   useEffect(() => {
     const streamAddListener = (
@@ -26,11 +29,7 @@ export const useVoxeetStreamAdded = (
     ) => {
       callback(participant, stream, VoxeetConferenceEvents.StreamAdded);
       onAttendeeAddCallback &&
-        onAttendeeAddCallback(
-          participant,
-          stream,
-          VoxeetConferenceEvents.StreamAdded
-        );
+        onAttendeeAddCallback(participant, VoxeetConferenceEvents.StreamAdded);
     };
 
     const streamRemoveListener = (
@@ -41,7 +40,6 @@ export const useVoxeetStreamAdded = (
       onAttendeeAddCallback &&
         onAttendeeAddCallback(
           participant,
-          stream,
           VoxeetConferenceEvents.StreamRemoved
         );
     };
