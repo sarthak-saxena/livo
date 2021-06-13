@@ -1,0 +1,22 @@
+name: Calculate JS Bundle Size
+
+on:
+  push:
+    branches:
+     - main
+  pull_request:
+    types: ['opened', 'reopened', 'synchronize']
+
+jobs:
+  calculate-bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: sarthak-saxena/JSBundleSize@master
+        with:
+          bootstrap: 'yarn install'
+          build_command: 'yarn run build'
+          dist_path: 'build'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+
