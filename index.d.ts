@@ -8,14 +8,9 @@ interface Props {
   room: Room;
 }
 
-declare const App: ({
+declare const Livo: ({
   mode,
   voxeetConfig,
   attendee,
   room,
 }: Props) => JSX.Element;
-
-declare interface VoxeetConfig {
-  consumerKey: string;
-  consumerSecret: string;
-}
