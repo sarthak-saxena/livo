@@ -1,16 +1,16 @@
+import { ParticipantInfo } from "@voxeet/voxeet-web-sdk/types/models/Options";
+
 export interface VoxeetConfig {
   consumerKey: string;
   consumerSecret: string;
 }
 
 export interface VoxeetAttendee {
-  _eventsCount: number;
   audioQuality: number;
   audio: boolean;
   id: string;
   type: string;
-  _events: {};
-  info: { name: string; externalId: string; sdkVersion: string };
+  info: ParticipantInfo;
   status: string;
   streams: MediaStream[];
 }

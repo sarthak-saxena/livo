@@ -5,14 +5,17 @@ import {
   ThemeProvider,
 } from "@material-ui/core/styles";
 import { ConferenceMode } from "./types/App";
-import { VoxeetConferenceEvents, VoxeetConfig } from "./types/Voxeet";
+import {
+  VoxeetAttendee,
+  VoxeetConferenceEvents,
+  VoxeetConfig,
+} from "./types/Voxeet";
 import { initializeVoxeet } from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { useVoxeetStreamAdded } from "./services/hooks/voxeetHook";
-import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 
 let Theme = createMuiTheme();
 Theme = responsiveFontSizes(Theme);
@@ -23,7 +26,7 @@ interface Props {
   attendee: Attendee;
   room: Room;
   onAttendeeAdd?: (
-    participant: Participant,
+    participant: VoxeetAttendee,
     stream: MediaStream,
     event: VoxeetConferenceEvents
   ) => void;
