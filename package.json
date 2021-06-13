@@ -24,7 +24,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15"
+    "@types/jest": "^26.0.15",
+	"gzipper": "^4.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -32,7 +33,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier": "prettier --write '{src,test}/**/*.{js,ts,less,css,tsx,jsx}'",
-    "postinstall": "tsc -p libtsConfig.json && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files"
+    "postinstall": "tsc -p libtsConfig.json && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files",
+	"postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
   },
   "eslintConfig": {
     "extends": [
