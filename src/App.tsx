@@ -58,7 +58,13 @@ export const App = ({
       .catch((error) => {
         onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
       });
-  }, [voxeetConfig, attendee, room]);
+  }, [
+    voxeetConfig,
+    attendee,
+    room,
+    onAppInitializedSuccessCallback,
+    onAppInitializedErrorCallback,
+  ]);
 
   return (
     <ThemeProvider theme={Theme}>
