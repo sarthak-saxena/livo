@@ -55,5 +55,5 @@ export const useVoxeetStreamAdded = (
         streamRemoveListener
       );
     };
-  }, [callback]);
+  }, [callback, onAttendeeAddCallback]);
 };
