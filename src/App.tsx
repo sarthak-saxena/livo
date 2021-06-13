@@ -8,13 +8,9 @@ import { ConferenceMode } from "./types/App";
 import {
   VoxeetAttendee,
   VoxeetConferenceEvents,
-  VoxeetConfig,
+  SdkAPIConfig,
 } from "./types/Voxeet";
-import {
-  initializeVoxeet,
-  purgeVoxeetConference,
-  purgeVoxeetSession,
-} from "./core/voxeet/sdk";
+import { initializeVoxeet } from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
@@ -26,7 +22,7 @@ Theme = responsiveFontSizes(Theme);
 
 interface Props {
   mode: ConferenceMode;
-  voxeetConfig: VoxeetConfig;
+  apiConfig: SdkAPIConfig;
   attendee: Attendee;
   room: Room;
   onAttendeeAdd?: (
@@ -39,7 +35,7 @@ interface Props {
 
 export const App = ({
   mode,
-  voxeetConfig,
+  apiConfig,
   attendee,
   room,
   onAttendeeAdd,
@@ -51,7 +47,7 @@ export const App = ({
   );
 
   useEffect(() => {
-    initializeVoxeet(voxeetConfig, attendee, room)
+    initializeVoxeet(apiConfig, attendee, room)
       .then((conference) => {
         if (conference) {
           setConference(conference);
@@ -63,7 +59,7 @@ export const App = ({
         onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
       });
   }, [
-    voxeetConfig,
+    apiConfig,
     attendee,
     room,
     onAppInitializedSuccessCallback,

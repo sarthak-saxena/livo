@@ -1,12 +1,12 @@
 import VoxeetSdk from "@voxeet/voxeet-web-sdk";
-import { VoxeetConfig } from "../../types/Voxeet";
+import { SdkAPIConfig } from "../../types/Voxeet";
 import { Attendee, Room } from "../../types/Conference";
 import { JoinOptions } from "@voxeet/voxeet-web-sdk/types/models/Options";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 
 export const initializeVoxeet = async (
-  config: VoxeetConfig,
+  config: SdkAPIConfig,
   creator: Attendee,
   room: Room
 ): Promise<Conference | undefined> => {

@@ -1,6 +1,6 @@
 import { ParticipantInfo } from "@voxeet/voxeet-web-sdk/types/models/Options";
 
-export interface VoxeetConfig {
+export interface SdkAPIConfig {
   consumerKey: string;
   consumerSecret: string;
 }
