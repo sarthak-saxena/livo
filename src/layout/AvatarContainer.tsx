@@ -48,8 +48,8 @@ const UserAvatarContainer = () => {
   const { conference } = useVoxeet();
   const { onAttendeeAdd } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
-  const onAttendeeAddCallback = useAttendeeAddCallback(attendees, setAttendees);
-  useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
+  const callback = useAttendeeAddCallback(attendees, setAttendees);
+  useVoxeetStreamAdded(callback, onAttendeeAdd);
 
   useEffect(() => {
     const attendees = Array.from(
