@@ -12,6 +12,8 @@ export const initializeVoxeet = async (
 ): Promise<Conference | undefined> => {
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
+    // close active voxeet session
+    VoxeetSdk.session.participant && (await purgeVoxeetSession());
     await VoxeetSdk.session.open({
       name: creator.name,
       externalId: creator.id,
@@ -24,25 +26,23 @@ export const initializeVoxeet = async (
   }
 };
 
-export const purgeVoxeet = async () => {
+export const purgeVoxeetSession = async () => {
+  await VoxeetSdk.session.close();
+};
+
+export const purgeVoxeetConference = async () => {
   await VoxeetSdk.conference.leave({ leaveRoom: true });
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {
-  const url = new URL(window.location.href);
-  const conferenceId = url.searchParams.get("conferenceId");
-  if (conferenceId) {
-    return conferenceId;
-  } else {
-    return await VoxeetSdk.conference
-      .create({
-        alias: room.name,
-        params: {
-          dolbyVoice: true,
-        },
-      })
-      .then((conference) => conference.id);
-  }
+  return await VoxeetSdk.conference
+    .create({
+      alias: room.id,
+      params: {
+        dolbyVoice: true,
+      },
+    })
+    .then((conference) => conference.id);
 };
 
 export const createConference = async (

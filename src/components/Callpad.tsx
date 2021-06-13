@@ -4,7 +4,10 @@ import CallEndIcon from "@material-ui/icons/CallEnd";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { toggleMuteSelfAttendee, purgeVoxeet } from "../core/voxeet/sdk";
+import {
+  toggleMuteSelfAttendee,
+  purgeVoxeetConference,
+} from "../core/voxeet/sdk";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,7 +48,7 @@ const CallPad = () => {
         <Grid
           item
           onClick={() => {
-            purgeVoxeet();
+            purgeVoxeetConference();
           }}
         >
           <CallEndIcon className={classes.icon} />

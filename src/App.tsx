@@ -10,7 +10,11 @@ import {
   VoxeetConferenceEvents,
   VoxeetConfig,
 } from "./types/Voxeet";
-import { initializeVoxeet } from "./core/voxeet/sdk";
+import {
+  initializeVoxeet,
+  purgeVoxeetConference,
+  purgeVoxeetSession,
+} from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
@@ -74,7 +78,7 @@ export const App = ({
             <ConferenceContainer mode={mode} />
           </VoxeetContext.Provider>
         ) : (
-          <></>
+          <>Initializing Livo...</>
         )}
       </UserContext.Provider>
     </ThemeProvider>
