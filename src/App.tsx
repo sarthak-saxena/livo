@@ -12,8 +12,7 @@ import { VoxeetContext } from "./services/context/voxeetContext";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { UserContext } from "./services/context/userContext";
 import { ThemeProvider } from "theming";
-import "./sass/index.sass";
-import "./index.sass";
+import "./styles/index.sass";
 import Box from "./components/ui/Box";
 
 const theme = {
