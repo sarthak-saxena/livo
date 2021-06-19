@@ -1,9 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  createMuiTheme,
-  responsiveFontSizes,
-  ThemeProvider,
-} from "@material-ui/core/styles";
 import { ConferenceMode } from "./types/App";
 import {
   VoxeetAttendee,
@@ -16,9 +11,14 @@ import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { UserContext } from "./services/context/userContext";
+import { ThemeProvider } from "theming";
+import "./sass/index.sass";
+import "./index.sass";
 
-let Theme = createMuiTheme();
-Theme = responsiveFontSizes(Theme);
+const theme = {
+  color: "black",
+  background: "white",
+};
 
 interface Props {
   mode: ConferenceMode;
@@ -67,11 +67,13 @@ export const App = ({
   ]);
 
   return (
-    <ThemeProvider theme={Theme}>
+    <ThemeProvider theme={theme}>
       <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
         {conference ? (
           <VoxeetContext.Provider value={{ conference }}>
-            <ConferenceContainer mode={mode} />
+            <div className={"container"}>
+              <ConferenceContainer mode={mode} />
+            </div>
           </VoxeetContext.Provider>
         ) : (
           <>Initializing Livo...</>

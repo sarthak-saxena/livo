@@ -12,20 +12,23 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@voxeet/voxeet-web-sdk": "^3.1.6",
+    "babel-cli": "^6.6.5",
+    "bulma": "^0.9.3",
     "clsx": "^1.1.1",
+    "node-sass": "^6.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-jss": "^10.6.0",
     "react-scripts": "4.0.3",
     "typescript": "^4.1.2",
-    "web-vitals": "^1.0.1",
-    "babel-cli": "^6.6.5"
+    "web-vitals": "^1.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
-	"gzipper": "^4.5.0"
+    "gzipper": "^4.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,7 +37,7 @@
     "eject": "react-scripts eject",
     "prettier": "prettier --write '{src,test}/**/*.{js,ts,less,css,tsx,jsx}'",
     "postinstall": "tsc -p libtsConfig.json && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files",
-	"postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
+    "postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
   },
   "eslintConfig": {
     "extends": [
