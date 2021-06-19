@@ -14,6 +14,7 @@ import { UserContext } from "./services/context/userContext";
 import { ThemeProvider } from "theming";
 import "./sass/index.sass";
 import "./index.sass";
+import Box from "./components/ui/Box";
 
 const theme = {
   color: "black",
@@ -71,9 +72,9 @@ export const App = ({
       <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
         {conference ? (
           <VoxeetContext.Provider value={{ conference }}>
-            <div className={"container"}>
+            <Box className={"container"}>
               <ConferenceContainer mode={mode} />
-            </div>
+            </Box>
           </VoxeetContext.Provider>
         ) : (
           <>Initializing Livo...</>

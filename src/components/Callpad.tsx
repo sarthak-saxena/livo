@@ -1,67 +1,74 @@
 import React, { useCallback, useState } from "react";
-import { Box, Grid, makeStyles, Theme } from "@material-ui/core";
-import CallEndIcon from "@material-ui/icons/CallEnd";
-import MicIcon from "@material-ui/icons/Mic";
-import MicOffIcon from "@material-ui/icons/MicOff";
-import SettingsIcon from "@material-ui/icons/Settings";
 import {
-  toggleMuteSelfAttendee,
   purgeVoxeetConference,
+  toggleMuteSelfAttendee,
 } from "../core/voxeet/sdk";
+import Row from "./ui/Row";
+import Box from "./ui/Box";
+import {
+  faMicrophone,
+  faMicrophoneSlash,
+  faPhone,
+  faSlidersH,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createUseStyles } from "react-jss";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
-    padding: 20,
     position: "fixed",
     bottom: 0,
     borderTop: "1px solid gainsboro",
+    width: "92%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px 20px 0 20px",
   },
-  icon: {
+  iconWrapper: {
     border: "1px solid gainsboro",
     borderRadius: "50%",
     padding: "1rem",
     "&:hover": {
       background: "gainsboro",
     },
+    margin: "0 1rem 0 1rem",
+  },
+  micIcon: {
+    width: "1.2rem !important",
   },
 }));
 
-const CallPad = () => {
-  const classes = useStyles();
+const CallPad = ({ ...props }) => {
+  const classes = useStylesFromThemeFunction(props);
   const [isMikeMute, muteMike] = useState(false);
   const muteMikeCallback = useCallback(() => {
     toggleMuteSelfAttendee();
     muteMike(!isMikeMute);
   }, [isMikeMute]);
-  const Icon = isMikeMute ? MicOffIcon : MicIcon;
+  const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
 
   return (
     <>
-      <Grid
-        direction="row"
-        alignItems="center"
-        justify="center"
-        spacing={1}
-        container
-        className={classes.root}
-      >
-        <Grid
-          item
+      <Row className={classes.root}>
+        <Box
           onClick={() => {
             purgeVoxeetConference();
           }}
+          className={classes.iconWrapper}
         >
-          <CallEndIcon className={classes.icon} />
-        </Grid>
-        <Grid item>
-          <Box onClick={muteMikeCallback}>
-            <Icon className={classes.icon} />
-          </Box>
-        </Grid>
-        <Grid item>
-          <SettingsIcon className={classes.icon} />
-        </Grid>
-      </Grid>
+          <FontAwesomeIcon size={"lg"} icon={faPhone} />
+        </Box>
+        <Box onClick={muteMikeCallback} className={classes.iconWrapper}>
+          <FontAwesomeIcon
+            size={"lg"}
+            icon={Icon}
+            className={classes.micIcon}
+          />
+        </Box>
+        <Box className={classes.iconWrapper}>
+          <FontAwesomeIcon size={"lg"} icon={faSlidersH} />
+        </Box>
+      </Row>
     </>
   );
 };

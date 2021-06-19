@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Grid from "@material-ui/core/Grid";
 import UserAvatar from "../components/UserAvatar";
-import { Box, makeStyles, Theme } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
 import { useVoxeet, useVoxeetStreamAdded } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetConferenceEvents } from "../types/Voxeet";
 import { useAttendee } from "../services/hooks/userHook";
+import { createUseStyles } from "react-jss";
+import Box from "../components/ui/Box";
+import Typography from "../components/ui/Typography";
+import Column from "../components/ui/Column";
+import Row from "../components/ui/Row";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
     padding: 20,
   },
@@ -43,8 +45,8 @@ const useAttendeeAddCallback = (
   );
 };
 
-const UserAvatarContainer = () => {
-  const classes = useStyles();
+const UserAvatarContainer = ({ ...props }) => {
+  const classes = useStylesFromThemeFunction(props);
   const { conference } = useVoxeet();
   const { onAttendeeAdd } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
@@ -59,24 +61,20 @@ const UserAvatarContainer = () => {
   }, [conference]);
 
   return (
-    <Box>
+    <Box className={""}>
       <>
         <Typography>On Air</Typography>
-        <Grid container spacing={2} className={classes.root}>
-          <Grid item lg={2} md={2} sm={3} xs={3}>
-            {/*<UserAvatar  />*/}
-          </Grid>
-        </Grid>
+        <Column>{/*<UserAvatar  />*/}</Column>
       </>
       <>
         <Typography>Members Connected: {attendees.length}</Typography>
-        <Grid container spacing={2} className={classes.root}>
-          {attendees.map((attendee) => (
-            <Grid item lg={2} md={2} sm={3} xs={3} key={attendee.id}>
+        <Row>
+          <Column className={"is-desktop"}>
+            {attendees.map((attendee) => (
               <UserAvatar attendee={attendee} />
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+          </Column>
+        </Row>
       </>
     </Box>
   );

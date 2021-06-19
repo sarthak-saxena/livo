@@ -1,12 +1,11 @@
-import Card from "@material-ui/core/Card";
 import React from "react";
-import { CardContent } from "@material-ui/core";
+import Box from "./ui/Box";
 
 const VideoStream = () => {
   return (
-    <Card>
-      <CardContent>Test</CardContent>
-    </Card>
+    <Box className={"card"}>
+      <Box className={"content"}>Test</Box>
+    </Box>
   );
 };
 
