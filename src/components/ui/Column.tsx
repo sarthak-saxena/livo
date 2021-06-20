@@ -8,15 +8,13 @@ interface Props {
 }
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
-  container: {
-    width: "100%",
-  },
+  container: {},
 }));
 
 const Column = ({ children, className, ...props }: Props): JSX.Element => {
   const classes = useStylesFromThemeFunction(props);
   return (
-    <div className={clsx("columns", classes.container, className)}>
+    <div className={clsx("column", classes.container, className)}>
       {children}
     </div>
   );

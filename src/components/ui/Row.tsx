@@ -11,7 +11,9 @@ interface Props {
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   container: {
     width: "100%",
-    margin: "2rem 1rem 2rem 1rem !important",
+    // margin: "2rem 1rem 2rem 1rem !important",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
 }));
 

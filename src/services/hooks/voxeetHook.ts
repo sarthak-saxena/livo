@@ -1,13 +1,16 @@
 import { useContext, useEffect } from "react";
 import { VoxeetContext } from "../context/voxeetContext";
 import { VoxeetContextType } from "../../types/context";
-import { VoxeetConferenceEvents } from "../../types/Voxeet";
+import { VoxeetCommandType, VoxeetConferenceEvents } from "../../types/Voxeet";
 import VoxeetSdk from "@voxeet/voxeet-web-sdk";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
+import CallbackEventListener from "../../core/callback";
 const conference = VoxeetSdk.conference;
 export const useVoxeet: () => VoxeetContextType = () => {
   return useContext(VoxeetContext);
 };
+
+export const voxeetHookCallback = new CallbackEventListener();
 
 type StreamAddedCallback = (
   participant: Participant,
@@ -56,4 +59,37 @@ export const useVoxeetStreamAdded = (
       );
     };
   }, [callback, onAttendeeAddCallback]);
+};
+
+export const useOnRequestSpeakerAccess = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.RequestSpeakerAccess,
+      (participant: Participant) => {
+        callback(participant);
+      }
+    );
+  }, [callback]);
+};
+
+export const useOnGrantSpeakerAccess = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.GrantSpeakerAccess,
+      (participant: Participant) => {
+        callback(participant);
+      }
+    );
+  }, [callback]);
+};
+
+export const useOnDenySpeakerAccess = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.DenySpeakerAccess,
+      (participant: Participant) => {
+        callback(participant);
+      }
+    );
+  }, [callback]);
 };

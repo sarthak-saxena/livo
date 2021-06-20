@@ -1,7 +1,7 @@
 export interface Attendee {
   name: string;
   id: string;
-  isConferenceCreator?: true;
+  isConferenceCreator?: boolean;
 }
 
 export interface Room {

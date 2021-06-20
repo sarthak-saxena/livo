@@ -20,5 +20,4 @@ export const SampleUsers: Attendee[] = [
 export const SampleAttendee: Attendee = {
   name: `User ${randomId}`,
   id: randomId,
-  isConferenceCreator: true,
 };

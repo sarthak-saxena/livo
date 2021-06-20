@@ -4,6 +4,12 @@ import reportWebVitals from "./reportWebVitals";
 import { ConferenceMode } from "./types/App";
 import { SampleAttendee, SampleRoom } from "./testConfig/config";
 import { App } from "./App";
+const url = new URL((window as any).location);
+
+const attendee = {
+  ...SampleAttendee,
+  isConferenceCreator: Boolean(url.searchParams.get("creator")),
+};
 
 ReactDOM.render(
   <React.StrictMode>
@@ -12,7 +18,7 @@ ReactDOM.render(
         consumerKey: "nw5wqOFjDuzrHbTsQXJj6Q==",
         consumerSecret: "u1dXQWADNBbQ44jdg4Skl_Jc3Xw82JGDEDq6zGBTxc0=",
       }}
-      attendee={SampleAttendee}
+      attendee={attendee}
       room={SampleRoom}
       mode={ConferenceMode.AudioConference}
     />

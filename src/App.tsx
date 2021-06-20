@@ -71,7 +71,7 @@ export const App = ({
       <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
         {conference ? (
           <VoxeetContext.Provider value={{ conference }}>
-            <Box className={"container"}>
+            <Box className={"app-container"}>
               <ConferenceContainer mode={mode} />
             </Box>
           </VoxeetContext.Provider>

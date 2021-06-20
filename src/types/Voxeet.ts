@@ -1,4 +1,5 @@
 import { ParticipantInfo } from "@voxeet/voxeet-web-sdk/types/models/Options";
+import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 
 export interface SdkAPIConfig {
   consumerKey: string;
@@ -18,4 +19,22 @@ export interface VoxeetAttendee {
 export enum VoxeetConferenceEvents {
   StreamAdded = "streamAdded",
   StreamRemoved = "streamRemoved",
+}
+
+interface VoxeetParticipantInfo extends ParticipantInfo {
+  params?: {
+    isCreator: boolean;
+  };
+}
+
+export interface VoxeetParticipant extends Participant {
+  info: VoxeetParticipantInfo;
+}
+
+export enum VoxeetCommandType {
+  RequestSpeakerAccess = "RequestSpeakerAccess",
+  RemoveSpeaker = "RemoveSpeaker",
+  GrantSpeakerAccess = "GrantSpeakerAccess",
+  DenySpeakerAccess = "DenySpeakerAccess",
+  RaiseHand = "RaiseHand",
 }
