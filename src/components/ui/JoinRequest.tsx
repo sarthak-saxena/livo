@@ -49,7 +49,7 @@ const JoinRequest = ({ ...props }) => {
     const index = attendees.findIndex((a) => a.id === attendee.id);
     attendees.splice(index, 1);
     setAttendees(Object.assign([], attendees));
-    voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendee);
+    voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendee.id);
   };
 
   const denyAccess = (attendee: Participant) => {

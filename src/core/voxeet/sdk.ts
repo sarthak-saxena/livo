@@ -134,12 +134,10 @@ export const addEventlistenersForCommanding = () => {
       case VoxeetCommandType.RemoveSpeaker:
         break;
       case VoxeetCommandType.GrantSpeakerAccess:
-        if (attendeeId === participant.id) {
-          voxeetHookCallback.call(
-            VoxeetCommandType.GrantSpeakerAccess,
-            participant
-          );
-        }
+        voxeetHookCallback.call(
+          VoxeetCommandType.GrantSpeakerAccess,
+          attendeeId
+        );
         break;
       case VoxeetCommandType.DenySpeakerAccess:
         if (attendeeId === participant.id) {
@@ -153,4 +151,8 @@ export const addEventlistenersForCommanding = () => {
         console.error("Unknown command type");
     }
   });
+};
+
+export const getVoxeetSessionId = () => {
+  return VoxeetSdk.session.participant.id;
 };

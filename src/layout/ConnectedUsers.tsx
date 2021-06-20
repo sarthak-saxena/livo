@@ -54,9 +54,10 @@ export const useAttendeeAddCallback = (
 
 const useOnGrantSpeakerAccessCallback = (speakers, setSpeakers) => {
   return React.useCallback(
-    (participant: Participant) => {
-      speakers[participant.id] = true;
+    (attendeeId: string) => {
+      speakers[attendeeId] = true;
       setSpeakers(Object.assign({}, speakers));
+      debugger;
     },
     [speakers, setSpeakers]
   );

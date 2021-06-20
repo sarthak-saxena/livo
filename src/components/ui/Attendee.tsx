@@ -39,7 +39,7 @@ export const Attendee = ({
   const grantAccess = () => {
     grantConferenceSpeakerAccess(attendee.id);
     enableMakeSpeakerButton(false);
-    voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendee);
+    voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendee.id);
   };
 
   const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(true);

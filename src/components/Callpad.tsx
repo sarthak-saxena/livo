@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import {
+  getVoxeetSessionId,
   purgeVoxeetConference,
   requestConferenceSpeakerAccess,
   toggleMuteAttendee,
@@ -72,12 +73,17 @@ const useOnDenySpeakerAccessCallback = (enableRequestSpeakerAccessButton) => {
 };
 
 const useOnGrantSpeakerAccessCallback = (muteMike, enableMike) => {
-  return React.useCallback(() => {
-    toggleMuteAttendee();
-    muteMike(false);
-    debugger;
-    enableMike(true);
-  }, [muteMike, enableMike]);
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === getVoxeetSessionId()) {
+        toggleMuteAttendee();
+        muteMike(false);
+        debugger;
+        enableMike(true);
+      }
+    },
+    [muteMike, enableMike]
+  );
 };
 
 const CallPad = ({ ...props }) => {
