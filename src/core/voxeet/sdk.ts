@@ -104,7 +104,6 @@ export const requestConferenceSpeakerAccess = () => {
 };
 
 export const grantConferenceSpeakerAccess = (attendeeId: string) => {
-  debugger;
   VoxeetSdk.command.send(
     `${VoxeetCommandType.GrantSpeakerAccess}${CommandingEventSeparator}${attendeeId}`
   );
@@ -113,6 +112,18 @@ export const grantConferenceSpeakerAccess = (attendeeId: string) => {
 export const denyConferenceSpeakerAccess = (attendeeId: string) => {
   VoxeetSdk.command.send(
     `${VoxeetCommandType.DenySpeakerAccess}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
+export const raiseHandInConference = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.RaiseHand}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
+export const unRaiseHandInConference = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.unRaiseHand}${CommandingEventSeparator}${attendeeId}`
   );
 };
 
@@ -147,12 +158,18 @@ export const addEventlistenersForCommanding = () => {
           );
         }
         break;
+      case VoxeetCommandType.RaiseHand:
+        voxeetHookCallback.call(VoxeetCommandType.RaiseHand, attendeeId);
+        break;
+      case VoxeetCommandType.unRaiseHand:
+        voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, attendeeId);
+        break;
       default:
         console.error("Unknown command type");
     }
   });
 };
 
-export const getVoxeetSessionId = () => {
+export const getVoxeetSessionParticipantId = () => {
   return VoxeetSdk.session.participant.id;
 };

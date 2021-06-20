@@ -10,6 +10,7 @@ import { useAttendee } from "../services/hooks/userHook";
 import { useAttendeeAddCallback } from "../layout/ConnectedUsers";
 import JoinRequest from "./ui/JoinRequest";
 import { Attendee } from "./ui/Attendee";
+import RaisehandRequest from "./RaisehandRequest";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   container: {
@@ -48,6 +49,9 @@ export const AttendeeList = ({ ...props }) => {
 
   return (
     <Box className={clsx("box", classes.container)}>
+      <Row>
+        <RaisehandRequest />
+      </Row>
       {attendee.isConferenceCreator && (
         <Row>
           <JoinRequest />

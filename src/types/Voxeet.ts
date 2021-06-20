@@ -37,4 +37,5 @@ export enum VoxeetCommandType {
   GrantSpeakerAccess = "GrantSpeakerAccess",
   DenySpeakerAccess = "DenySpeakerAccess",
   RaiseHand = "RaiseHand",
+  unRaiseHand = "unRaiseHand",
 }

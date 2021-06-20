@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import UserAvatar from "../components/UserAvatar";
 import {
   useOnGrantSpeakerAccess,
-  useOnRequestSpeakerAccess,
   useVoxeet,
   useVoxeetStreamAdded,
 } from "../services/hooks/voxeetHook";
@@ -74,6 +73,7 @@ const ConnectedUsers = ({ ...props }) => {
     speakers,
     setSpeakers
   );
+
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onOnGrantSpeakerAccess);
 

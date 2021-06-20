@@ -1,9 +1,11 @@
 import React, { useCallback, useState } from "react";
 import {
-  getVoxeetSessionId,
+  getVoxeetSessionParticipantId,
   purgeVoxeetConference,
+  raiseHandInConference,
   requestConferenceSpeakerAccess,
   toggleMuteAttendee,
+  unRaiseHandInConference,
 } from "../core/voxeet/sdk";
 import Row from "./ui/Row";
 import Box from "./ui/Box";
@@ -23,8 +25,10 @@ import clsx from "clsx";
 import {
   useOnDenySpeakerAccess,
   useOnGrantSpeakerAccess,
+  voxeetHookCallback,
 } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
+import { VoxeetCommandType } from "../types/Voxeet";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -60,6 +64,10 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
     display: "flex",
     flexDirection: "row-reverse",
   },
+  button: {
+    width: "3.5rem",
+    height: "3.5rem",
+  },
 }));
 
 const useOnDenySpeakerAccessCallback = (enableRequestSpeakerAccessButton) => {
@@ -75,10 +83,9 @@ const useOnDenySpeakerAccessCallback = (enableRequestSpeakerAccessButton) => {
 const useOnGrantSpeakerAccessCallback = (muteMike, enableMike) => {
   return React.useCallback(
     (attendeeId: string) => {
-      if (attendeeId === getVoxeetSessionId()) {
+      if (attendeeId === getVoxeetSessionParticipantId()) {
         toggleMuteAttendee();
         muteMike(false);
-        debugger;
         enableMike(true);
       }
     },
@@ -87,13 +94,28 @@ const useOnGrantSpeakerAccessCallback = (muteMike, enableMike) => {
 };
 
 const CallPad = ({ ...props }) => {
-  const requestAccess = () => {
+  const requestSpeakerAccess = () => {
     requestConferenceSpeakerAccess();
     enableRequestSpeakerAccessButton(false);
   };
-  const { attendee } = useAttendee();
+
+  const raiseHand = () => {
+    const value = !isHandRaised;
+    const participantId = getVoxeetSessionParticipantId();
+    if (value) {
+      raiseHandInConference(participantId);
+      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
+    } else {
+      unRaiseHandInConference(participantId);
+      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
+    }
+
+    setHandRaised(value);
+  };
 
   const classes = useStylesFromThemeFunction(props);
+  const { attendee } = useAttendee();
+  const [isHandRaised, setHandRaised] = useState(false);
   const [isMikeMute, muteMike] = useState(true);
   const [isMikeEnabled, enableMike] = useState(attendee.isConferenceCreator);
   const [
@@ -148,12 +170,22 @@ const CallPad = ({ ...props }) => {
         <Box className={classes.iconWrapper}>
           <FontAwesomeIcon size={"lg"} icon={faSlidersH} />
         </Box>
-        <Box className={classes.iconWrapper}>
-          <FontAwesomeIcon
-            className={classes.handIcon}
-            size={"lg"}
-            icon={faHandPointUp}
-          />
+        <Box>
+          <button
+            onClick={raiseHand}
+            className={clsx(
+              classes.iconWrapper,
+              classes.button,
+              "button",
+              isHandRaised && "is-link"
+            )}
+          >
+            <FontAwesomeIcon
+              className={classes.handIcon}
+              size={"lg"}
+              icon={faHandPointUp}
+            />
+          </button>
         </Box>
       </Column>
       {!attendee.isConferenceCreator && (
@@ -161,7 +193,7 @@ const CallPad = ({ ...props }) => {
           <Box>
             <Button
               disabled={!requestSpeakerAccessButtonEnabled}
-              onClick={requestAccess}
+              onClick={requestSpeakerAccess}
               className={"is-link"}
             >
               Request speaker access

@@ -9,6 +9,7 @@ import {
   faMicrophoneSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import Typography from "./ui/Typography";
+import { useOnRaiseHand, useOnUnRaiseHand } from "../services/hooks/voxeetHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   container: {
@@ -25,19 +26,50 @@ interface Props {
   attendee: Participant;
 }
 
+const useOnRaiseHandCallback = (setHandRaised, attendee) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      attendee.id === attendeeId && setHandRaised(true);
+    },
+    [setHandRaised, attendee]
+  );
+};
+
+const useOnUnRaiseHandCallback = (setHandRaised, attendee) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      debugger;
+      attendee.id === attendeeId && setHandRaised(false);
+    },
+    [setHandRaised, attendee]
+  );
+};
+
 const UserAvatar = ({ attendee, ...props }: Props) => {
-  const classes = useStylesFromThemeFunction(props);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMikeMute, muteMike] = useState(true);
+  const [isHandRaised, setHandRaised] = useState(false);
+  const onRaiseHandCallback = useOnRaiseHandCallback(setHandRaised, attendee);
+  const onUnRaiseHandCallback = useOnUnRaiseHandCallback(
+    setHandRaised,
+    attendee
+  );
+  useOnRaiseHand(onRaiseHandCallback);
+  useOnUnRaiseHand(onUnRaiseHandCallback);
+  const classes = useStylesFromThemeFunction(props);
 
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   return (
     <Box className={classes.container}>
       <Avatar>SS</Avatar>
       <FontAwesomeIcon icon={Icon} />
-      <div>
+      <Box>
         <Typography>{attendee.info.name}</Typography>
-      </div>
+      </Box>
+      {isHandRaised && (
+        <Box>
+          <Typography>Hand raised</Typography>
+        </Box>
+      )}
     </Box>
   );
 };

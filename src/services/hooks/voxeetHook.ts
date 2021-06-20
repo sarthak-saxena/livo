@@ -94,3 +94,22 @@ export const useOnDenySpeakerAccess = (callback: Function) => {
     );
   }, [callback]);
 };
+
+export const useOnRaiseHand = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(VoxeetCommandType.RaiseHand, (attendeeId: string) => {
+      callback(attendeeId);
+    });
+  }, [callback]);
+};
+
+export const useOnUnRaiseHand = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.unRaiseHand,
+      (attendeeId: string) => {
+        callback(attendeeId);
+      }
+    );
+  }, [callback]);
+};
