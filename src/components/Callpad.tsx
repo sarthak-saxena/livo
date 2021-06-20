@@ -73,7 +73,6 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
 const useOnDenySpeakerAccessCallback = (enableRequestSpeakerAccessButton) => {
   return React.useCallback(
     (participant: Participant) => {
-      debugger;
       enableRequestSpeakerAccessButton(true);
     },
     [enableRequestSpeakerAccessButton]
@@ -104,10 +103,10 @@ const CallPad = ({ ...props }) => {
     const participantId = getVoxeetSessionParticipantId();
     if (value) {
       raiseHandInConference(participantId);
-      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
+      // voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
+      // voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);
@@ -122,7 +121,6 @@ const CallPad = ({ ...props }) => {
     requestSpeakerAccessButtonEnabled,
     enableRequestSpeakerAccessButton,
   ] = useState(true);
-  debugger;
 
   const muteMikeCallback = useCallback(() => {
     toggleMuteAttendee();

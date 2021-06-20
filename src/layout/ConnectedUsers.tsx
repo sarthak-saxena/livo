@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import UserAvatar from "../components/UserAvatar";
 import {
   useOnGrantSpeakerAccess,
+  useOnRaiseHand,
+  useOnUnRaiseHand,
   useVoxeet,
   useVoxeetStreamAdded,
 } from "../services/hooks/voxeetHook";
@@ -56,26 +58,55 @@ const useOnGrantSpeakerAccessCallback = (speakers, setSpeakers) => {
     (attendeeId: string) => {
       speakers[attendeeId] = true;
       setSpeakers(Object.assign({}, speakers));
-      debugger;
     },
     [speakers, setSpeakers]
+  );
+};
+
+const useOnRaiseHandCallback = (setHandsRaised, handsRaised) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      handsRaised[attendeeId] = true;
+      setHandsRaised(Object.assign({}, handsRaised));
+    },
+    [setHandsRaised, handsRaised]
+  );
+};
+
+const useOnUnRaiseHandCallback = (setHandsRaised, handsRaised) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      handsRaised[attendeeId] = false;
+      setHandsRaised(Object.assign({}, handsRaised));
+    },
+    [setHandsRaised, handsRaised]
   );
 };
 
 const ConnectedUsers = ({ ...props }) => {
   const classes = useStylesFromThemeFunction(props);
   const { conference } = useVoxeet();
+  const [speakers, setSpeakers] = useState({} as { [id: string]: boolean });
+  const [handsRaised, setHandsRaised] = useState(
+    {} as { [id: string]: boolean }
+  );
   const { onAttendeeAdd, attendee } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
-  const [speakers, setSpeakers] = useState({} as { [id: string]: boolean });
   const onAttendeeAddCallback = useAttendeeAddCallback(attendees, setAttendees);
   const onOnGrantSpeakerAccess = useOnGrantSpeakerAccessCallback(
     speakers,
     setSpeakers
   );
+  const onRaiseHandCallback = useOnRaiseHandCallback(setHandsRaised, attendee);
+  const onUnRaiseHandCallback = useOnUnRaiseHandCallback(
+    setHandsRaised,
+    handsRaised
+  );
 
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onOnGrantSpeakerAccess);
+  useOnRaiseHand(onRaiseHandCallback);
+  useOnUnRaiseHand(onUnRaiseHandCallback);
 
   useEffect(() => {
     const attendees = Array.from(
@@ -97,7 +128,10 @@ const ConnectedUsers = ({ ...props }) => {
             if (speakers[voxeetAttendee.id] || isCreator(voxeetAttendee)) {
               return (
                 <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar attendee={voxeetAttendee} />
+                  <UserAvatar
+                    isHandRaised={handsRaised[voxeetAttendee.id]}
+                    attendee={voxeetAttendee}
+                  />
                 </Column>
               );
             }
@@ -113,7 +147,10 @@ const ConnectedUsers = ({ ...props }) => {
             if (!speakers[voxeetAttendee.id] && !isCreator(voxeetAttendee)) {
               return (
                 <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar attendee={voxeetAttendee} />
+                  <UserAvatar
+                    isHandRaised={handsRaised[voxeetAttendee.id]}
+                    attendee={voxeetAttendee}
+                  />
                 </Column>
               );
             }

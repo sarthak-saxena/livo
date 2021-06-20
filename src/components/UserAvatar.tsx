@@ -24,37 +24,12 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
 
 interface Props {
   attendee: Participant;
+  isHandRaised: boolean;
 }
 
-const useOnRaiseHandCallback = (setHandRaised, attendee) => {
-  return React.useCallback(
-    (attendeeId: string) => {
-      attendee.id === attendeeId && setHandRaised(true);
-    },
-    [setHandRaised, attendee]
-  );
-};
-
-const useOnUnRaiseHandCallback = (setHandRaised, attendee) => {
-  return React.useCallback(
-    (attendeeId: string) => {
-      debugger;
-      attendee.id === attendeeId && setHandRaised(false);
-    },
-    [setHandRaised, attendee]
-  );
-};
-
-const UserAvatar = ({ attendee, ...props }: Props) => {
+const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
   const [isMikeMute, muteMike] = useState(true);
-  const [isHandRaised, setHandRaised] = useState(false);
-  const onRaiseHandCallback = useOnRaiseHandCallback(setHandRaised, attendee);
-  const onUnRaiseHandCallback = useOnUnRaiseHandCallback(
-    setHandRaised,
-    attendee
-  );
-  useOnRaiseHand(onRaiseHandCallback);
-  useOnUnRaiseHand(onUnRaiseHandCallback);
+
   const classes = useStylesFromThemeFunction(props);
 
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
