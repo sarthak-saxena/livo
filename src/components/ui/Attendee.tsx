@@ -5,7 +5,10 @@ import clsx from "clsx";
 import Avatar, { AvatarSize } from "./Avatar";
 import Typography from "./Typography";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMicrophone,
+  faMicrophoneSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 import React, { useState } from "react";
 import {
@@ -18,6 +21,7 @@ import {
   voxeetHookCallback,
 } from "../../services/hooks/voxeetHook";
 import { VoxeetCommandType } from "../../types/Voxeet";
+import { getShortHandName } from "../../core/Utilities";
 
 interface Props {
   attendee: Participant;
@@ -75,6 +79,8 @@ export const Attendee = ({
   };
 
   const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(true);
+  const [isMikeMute, muteMike] = useState(true);
+  const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   const classes = useStylesFromThemeFunction(props);
   const onOnGrantSpeakerAccessCallback = useOnOnGrantSpeakerAccessCallback(
     attendee.id,
@@ -87,13 +93,17 @@ export const Attendee = ({
       <Column className={"is-full"}>
         <Row className={classes.userWrapper}>
           <Column className={clsx("is-one-fifth", classes.avatarWrapper)}>
-            <Avatar size={AvatarSize.Small}>SS</Avatar>
+            <Avatar size={AvatarSize.Small}>
+              {getShortHandName(attendee.info.name)}
+            </Avatar>
           </Column>
           <Column>
             <Typography>{attendee.info.name}</Typography>
           </Column>
           <Column>
-            <FontAwesomeIcon size={"sm"} icon={faMicrophoneSlash} />
+            <Button disabled={!isConferenceCreator}>
+              <FontAwesomeIcon size={"sm"} icon={Icon} />
+            </Button>
           </Column>
           {isConferenceCreator && id !== attendee.info?.externalId && (
             <Column>

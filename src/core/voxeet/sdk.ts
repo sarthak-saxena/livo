@@ -95,6 +95,8 @@ export const toggleMuteAttendee = (participant?: Participant) => {
   );
 };
 
+export const isAttendeeMuted = (): boolean => VoxeetSdk.conference.isMuted();
+
 export const muteAttendee = (participant: Participant, isMuted: boolean) => {
   VoxeetSdk.conference.mute(participant, isMuted);
 };

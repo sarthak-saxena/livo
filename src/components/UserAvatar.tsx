@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Typography from "./ui/Typography";
 import { useOnRaiseHand, useOnUnRaiseHand } from "../services/hooks/voxeetHook";
+import { getShortHandName } from "../core/Utilities";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   container: {
@@ -28,11 +29,6 @@ interface Props {
 }
 
 const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
-  const getShortHandName = () => {
-    const array = attendee.info.name.split(" ");
-    return `${array[0][0]}${array[1] ? array[1][0] : ""}`;
-  };
-
   const [isMikeMute, muteMike] = useState(true);
 
   const classes = useStylesFromThemeFunction(props);
@@ -40,7 +36,7 @@ const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   return (
     <Box className={classes.container}>
-      <Avatar>{getShortHandName()}</Avatar>
+      <Avatar>{getShortHandName(attendee.info.name)}</Avatar>
       <FontAwesomeIcon icon={Icon} />
       <Box>
         <Typography>{attendee.info.name}</Typography>
