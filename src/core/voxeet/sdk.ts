@@ -109,6 +109,12 @@ export const grantConferenceSpeakerAccess = (attendeeId: string) => {
   );
 };
 
+export const revokeConferenceSpeakerAccess = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.RevokeSpeakerAccess}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
 export const denyConferenceSpeakerAccess = (attendeeId: string) => {
   VoxeetSdk.command.send(
     `${VoxeetCommandType.DenySpeakerAccess}${CommandingEventSeparator}${attendeeId}`
@@ -126,8 +132,6 @@ export const unRaiseHandInConference = (attendeeId: string) => {
     `${VoxeetCommandType.unRaiseHand}${CommandingEventSeparator}${attendeeId}`
   );
 };
-
-export const removeConferenceSpeakerAccess = () => {};
 
 export const addEventlistenersForCommanding = () => {
   const participant = VoxeetSdk.session.participant;
@@ -147,6 +151,12 @@ export const addEventlistenersForCommanding = () => {
       case VoxeetCommandType.GrantSpeakerAccess:
         voxeetHookCallback.call(
           VoxeetCommandType.GrantSpeakerAccess,
+          attendeeId
+        );
+        break;
+      case VoxeetCommandType.RevokeSpeakerAccess:
+        voxeetHookCallback.call(
+          VoxeetCommandType.RevokeSpeakerAccess,
           attendeeId
         );
         break;

@@ -25,6 +25,7 @@ import clsx from "clsx";
 import {
   useOnDenySpeakerAccess,
   useOnGrantSpeakerAccess,
+  useOnRevokeSpeakerAccess,
   voxeetHookCallback,
 } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
@@ -79,13 +80,36 @@ const useOnDenySpeakerAccessCallback = (enableRequestSpeakerAccessButton) => {
   );
 };
 
-const useOnGrantSpeakerAccessCallback = (muteMike, enableMike) => {
+const useOnGrantSpeakerAccessCallback = (
+  muteMike,
+  enableMike,
+  enableRequestSpeakerAccessButton
+) => {
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === getVoxeetSessionParticipantId()) {
         toggleMuteAttendee();
         muteMike(false);
         enableMike(true);
+        enableRequestSpeakerAccessButton(false);
+      }
+    },
+    [muteMike, enableMike]
+  );
+};
+
+const useOnRevokeSpeakerAccessCallback = (
+  muteMike,
+  enableMike,
+  enableRequestSpeakerAccessButton
+) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === getVoxeetSessionParticipantId()) {
+        toggleMuteAttendee();
+        muteMike(true);
+        enableMike(false);
+        enableRequestSpeakerAccessButton(true);
       }
     },
     [muteMike, enableMike]
@@ -131,13 +155,20 @@ const CallPad = ({ ...props }) => {
   const onDenySpeakerAccessCallback = useOnDenySpeakerAccessCallback(
     enableRequestSpeakerAccessButton
   );
-  useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
-
-  const onOnGrantSpeakerAccess = useOnGrantSpeakerAccessCallback(
+  const onGrantSpeakerAccess = useOnGrantSpeakerAccessCallback(
     muteMike,
-    enableMike
+    enableMike,
+    enableRequestSpeakerAccessButton
   );
-  useOnGrantSpeakerAccess(onOnGrantSpeakerAccess);
+  const onRevokeSpeakerAccess = useOnRevokeSpeakerAccessCallback(
+    muteMike,
+    enableMike,
+    enableRequestSpeakerAccessButton
+  );
+
+  useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
+  useOnGrantSpeakerAccess(onGrantSpeakerAccess);
+  useOnRevokeSpeakerAccess(onRevokeSpeakerAccess);
 
   return (
     <Row className={classes.root}>
@@ -150,12 +181,16 @@ const CallPad = ({ ...props }) => {
         >
           <FontAwesomeIcon size={"lg"} icon={faPhone} />
         </Box>
-        {/*<button>*/}
         <Box>
           <button
             onClick={muteMikeCallback}
-            className={classes.iconWrapper}
-            disabled={!attendee.isConferenceCreator || !isMikeEnabled}
+            className={clsx(
+              classes.iconWrapper,
+              classes.button,
+              "button",
+              isHandRaised && "is-link"
+            )}
+            disabled={attendee.isConferenceCreator ? false : !isMikeEnabled}
           >
             <FontAwesomeIcon
               size={"lg"}
@@ -164,7 +199,6 @@ const CallPad = ({ ...props }) => {
             />
           </button>
         </Box>
-        {/*</button>*/}
         <Box className={classes.iconWrapper}>
           <FontAwesomeIcon size={"lg"} icon={faSlidersH} />
         </Box>

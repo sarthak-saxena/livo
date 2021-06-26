@@ -8,9 +8,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 import React, { useState } from "react";
-import { grantConferenceSpeakerAccess } from "../../core/voxeet/sdk";
+import {
+  grantConferenceSpeakerAccess,
+  revokeConferenceSpeakerAccess,
+} from "../../core/voxeet/sdk";
 import { createUseStyles } from "react-jss";
-import { voxeetHookCallback } from "../../services/hooks/voxeetHook";
+import {
+  useOnGrantSpeakerAccess,
+  voxeetHookCallback,
+} from "../../services/hooks/voxeetHook";
 import { VoxeetCommandType } from "../../types/Voxeet";
 
 interface Props {
@@ -30,6 +36,20 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   },
 }));
 
+const useOnOnGrantSpeakerAccessCallback = (
+  id: string,
+  enableMakeSpeakerButton
+) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === id) {
+        enableMakeSpeakerButton(false);
+      }
+    },
+    [id, enableMakeSpeakerButton]
+  );
+};
+
 export const Attendee = ({
   attendee,
   isConferenceCreator,
@@ -37,14 +57,31 @@ export const Attendee = ({
   ...props
 }: Props) => {
   const grantAccess = () => {
-    grantConferenceSpeakerAccess(attendee.id);
-    enableMakeSpeakerButton(false);
-    voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendee.id);
+    if (isMakeSpeakerButtonEnabled) {
+      grantConferenceSpeakerAccess(attendee.id);
+      enableMakeSpeakerButton(false);
+      voxeetHookCallback.call(
+        VoxeetCommandType.GrantSpeakerAccess,
+        attendee.id
+      );
+    } else {
+      revokeConferenceSpeakerAccess(attendee.id);
+      enableMakeSpeakerButton(true);
+      voxeetHookCallback.call(
+        VoxeetCommandType.RevokeSpeakerAccess,
+        attendee.id
+      );
+    }
   };
 
   const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(true);
-
   const classes = useStylesFromThemeFunction(props);
+  const onOnGrantSpeakerAccessCallback = useOnOnGrantSpeakerAccessCallback(
+    attendee.id,
+    enableMakeSpeakerButton
+  );
+  useOnGrantSpeakerAccess(onOnGrantSpeakerAccessCallback);
+
   return (
     <Row key={attendee.id}>
       <Column className={"is-full"}>
@@ -60,11 +97,12 @@ export const Attendee = ({
           </Column>
           {isConferenceCreator && id !== attendee.info?.externalId && (
             <Column>
-              <Button
-                disabled={!isMakeSpeakerButtonEnabled}
-                onClick={grantAccess}
-              >
-                Make Speaker
+              <Button onClick={grantAccess}>
+                <Typography>
+                  {isMakeSpeakerButtonEnabled
+                    ? "Make Speaker"
+                    : "Remove Speaker"}
+                </Typography>
               </Button>
             </Column>
           )}

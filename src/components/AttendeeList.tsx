@@ -60,8 +60,9 @@ export const AttendeeList = ({ ...props }) => {
 
       <Row>
         <Typography className={"is-size-4"}>Attendees</Typography>
-        {attendees.map((voxeetAttendee) => (
+        {attendees.map((voxeetAttendee, index) => (
           <Attendee
+            key={index}
             attendee={voxeetAttendee}
             isConferenceCreator={attendee.isConferenceCreator}
             id={attendee.id}

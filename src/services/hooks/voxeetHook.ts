@@ -84,6 +84,17 @@ export const useOnGrantSpeakerAccess = (callback: Function) => {
   }, [callback]);
 };
 
+export const useOnRevokeSpeakerAccess = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.RevokeSpeakerAccess,
+      (attendeeId: string) => {
+        callback(attendeeId);
+      }
+    );
+  }, [callback]);
+};
+
 export const useOnDenySpeakerAccess = (callback: Function) => {
   useEffect(() => {
     voxeetHookCallback.on(

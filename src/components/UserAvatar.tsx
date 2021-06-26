@@ -28,6 +28,11 @@ interface Props {
 }
 
 const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
+  const getShortHandName = () => {
+    const array = attendee.info.name.split(" ");
+    return `${array[0][0]}${array[1] ? array[1][0] : ""}`;
+  };
+
   const [isMikeMute, muteMike] = useState(true);
 
   const classes = useStylesFromThemeFunction(props);
@@ -35,7 +40,7 @@ const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   return (
     <Box className={classes.container}>
-      <Avatar>SS</Avatar>
+      <Avatar>{getShortHandName()}</Avatar>
       <FontAwesomeIcon icon={Icon} />
       <Box>
         <Typography>{attendee.info.name}</Typography>

@@ -3,6 +3,7 @@ import UserAvatar from "../components/UserAvatar";
 import {
   useOnGrantSpeakerAccess,
   useOnRaiseHand,
+  useOnRevokeSpeakerAccess,
   useOnUnRaiseHand,
   useVoxeet,
   useVoxeetStreamAdded,
@@ -63,6 +64,16 @@ const useOnGrantSpeakerAccessCallback = (speakers, setSpeakers) => {
   );
 };
 
+const useOnRevokeSpeakerAccessCallback = (speakers, setSpeakers) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      speakers[attendeeId] = false;
+      setSpeakers(Object.assign({}, speakers));
+    },
+    [speakers, setSpeakers]
+  );
+};
+
 const useOnRaiseHandCallback = (setHandsRaised, handsRaised) => {
   return React.useCallback(
     (attendeeId: string) => {
@@ -93,7 +104,11 @@ const ConnectedUsers = ({ ...props }) => {
   const { onAttendeeAdd, attendee } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
   const onAttendeeAddCallback = useAttendeeAddCallback(attendees, setAttendees);
-  const onOnGrantSpeakerAccess = useOnGrantSpeakerAccessCallback(
+  const onGrantSpeakerAccessCallback = useOnGrantSpeakerAccessCallback(
+    speakers,
+    setSpeakers
+  );
+  const onRevokeSpeakerAccessCallback = useOnRevokeSpeakerAccessCallback(
     speakers,
     setSpeakers
   );
@@ -104,7 +119,8 @@ const ConnectedUsers = ({ ...props }) => {
   );
 
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
-  useOnGrantSpeakerAccess(onOnGrantSpeakerAccess);
+  useOnGrantSpeakerAccess(onGrantSpeakerAccessCallback);
+  useOnRevokeSpeakerAccess(onRevokeSpeakerAccessCallback);
   useOnRaiseHand(onRaiseHandCallback);
   useOnUnRaiseHand(onUnRaiseHandCallback);
 
