@@ -13,11 +13,15 @@ import Button from "./Button";
 import React, { useState } from "react";
 import {
   grantConferenceSpeakerAccess,
+  invokeMuteAttendeeCommand,
+  invokeUnMuteAttendeeCommand,
   revokeConferenceSpeakerAccess,
 } from "../../core/voxeet/sdk";
 import { createUseStyles } from "react-jss";
 import {
   useOnGrantSpeakerAccess,
+  useOnMuteAttendee,
+  useOnUnMuteAttendee,
   voxeetHookCallback,
 } from "../../services/hooks/voxeetHook";
 import { VoxeetCommandType } from "../../types/Voxeet";
@@ -38,6 +42,7 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   userWrapper: {
     alignItems: "center",
   },
+  settingsWrapper: { display: "flex" },
 }));
 
 const useOnOnGrantSpeakerAccessCallback = (
@@ -51,6 +56,28 @@ const useOnOnGrantSpeakerAccessCallback = (
       }
     },
     [id, enableMakeSpeakerButton]
+  );
+};
+
+const useOnMuteAttendeeCallback = (muteMike, participantId: string) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === participantId) {
+        muteMike(true);
+      }
+    },
+    [muteMike]
+  );
+};
+
+const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === participantId) {
+        muteMike(false);
+      }
+    },
+    [muteMike]
   );
 };
 
@@ -71,10 +98,25 @@ export const Attendee = ({
     } else {
       revokeConferenceSpeakerAccess(attendee.id);
       enableMakeSpeakerButton(true);
+      muteMike(true);
       voxeetHookCallback.call(
         VoxeetCommandType.RevokeSpeakerAccess,
         attendee.id
       );
+      invokeMuteAttendeeCommand(attendee.id);
+      voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, attendee.id);
+    }
+  };
+
+  const onMuteMike = () => {
+    const mute = !isMikeMute;
+    muteMike(mute);
+    if (mute) {
+      invokeMuteAttendeeCommand(attendee.id);
+      voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, attendee.id);
+    } else {
+      invokeUnMuteAttendeeCommand(attendee.id);
+      voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, attendee.id);
     }
   };
 
@@ -86,7 +128,18 @@ export const Attendee = ({
     attendee.id,
     enableMakeSpeakerButton
   );
+  const onMuteAttendeeCallback = useOnMuteAttendeeCallback(
+    muteMike,
+    attendee.id
+  );
+  const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(
+    muteMike,
+    attendee.id
+  );
+
   useOnGrantSpeakerAccess(onOnGrantSpeakerAccessCallback);
+  useOnMuteAttendee(onMuteAttendeeCallback);
+  useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
   return (
     <Row key={attendee.id}>
@@ -100,13 +153,14 @@ export const Attendee = ({
           <Column>
             <Typography>{attendee.info.name}</Typography>
           </Column>
-          <Column>
-            <Button disabled={!isConferenceCreator}>
-              <FontAwesomeIcon size={"sm"} icon={Icon} />
-            </Button>
-          </Column>
           {isConferenceCreator && id !== attendee.info?.externalId && (
-            <Column>
+            <Column className={classes.settingsWrapper}>
+              <Button
+                onClick={onMuteMike}
+                disabled={isMakeSpeakerButtonEnabled}
+              >
+                <FontAwesomeIcon size={"sm"} icon={Icon} />
+              </Button>
               <Button onClick={grantAccess}>
                 <Typography>
                   {isMakeSpeakerButtonEnabled

@@ -1,7 +1,11 @@
 import { VoxeetCommandType } from "../types/Voxeet";
 
 interface Data {
-  [attendeeId: string]: { speaker: boolean; handRaised: boolean };
+  [attendeeId: string]: {
+    speaker: boolean;
+    handRaised: boolean;
+    mute: boolean;
+  };
 }
 
 export default class DataStore {
@@ -11,7 +15,11 @@ export default class DataStore {
 
   update(command: VoxeetCommandType, attendeeId: string) {
     if (!this.data[attendeeId]) {
-      this.data[attendeeId] = {} as { speaker: boolean; handRaised: boolean };
+      this.data[attendeeId] = {} as {
+        speaker: boolean;
+        handRaised: boolean;
+        mute: boolean;
+      };
     }
     switch (command) {
       case VoxeetCommandType.GrantSpeakerAccess:
@@ -25,6 +33,12 @@ export default class DataStore {
         break;
       case VoxeetCommandType.unRaiseHand:
         this.data[attendeeId].handRaised = false;
+        break;
+      case VoxeetCommandType.MuteAttendee:
+        this.data[attendeeId].mute = true;
+        break;
+      case VoxeetCommandType.UnMuteAttendee:
+        this.data[attendeeId].mute = false;
         break;
     }
   }

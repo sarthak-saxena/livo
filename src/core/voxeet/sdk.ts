@@ -88,16 +88,19 @@ export const joinConference = async (
   }
 };
 
-export const toggleMuteAttendee = (participant?: Participant) => {
+export const toggleMuteAttendee = (
+  participant?: Participant,
+  muted?: boolean
+) => {
   VoxeetSdk.conference.mute(
     participant || VoxeetSdk.session.participant,
-    !VoxeetSdk.conference.isMuted()
+    muted || !VoxeetSdk.conference.isMuted()
   );
 };
 
 export const isAttendeeMuted = (): boolean => VoxeetSdk.conference.isMuted();
 
-export const muteAttendee = (participant: Participant, isMuted: boolean) => {
+const muteAttendee = (participant: Participant, isMuted: boolean) => {
   VoxeetSdk.conference.mute(participant, isMuted);
 };
 
@@ -128,6 +131,18 @@ export const denyConferenceSpeakerAccess = (attendeeId: string) => {
 export const raiseHandInConference = (attendeeId: string) => {
   VoxeetSdk.command.send(
     `${VoxeetCommandType.RaiseHand}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
+export const invokeMuteAttendeeCommand = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.MuteAttendee}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
+export const invokeUnMuteAttendeeCommand = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.UnMuteAttendee}${CommandingEventSeparator}${attendeeId}`
   );
 };
 
@@ -176,6 +191,12 @@ export const addEventlistenersForCommanding = () => {
         break;
       case VoxeetCommandType.unRaiseHand:
         voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, attendeeId);
+        break;
+      case VoxeetCommandType.MuteAttendee:
+        voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, attendeeId);
+        break;
+      case VoxeetCommandType.UnMuteAttendee:
+        voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, attendeeId);
         break;
       default:
         console.error("Unknown command type");

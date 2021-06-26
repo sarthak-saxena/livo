@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from "react";
 import {
   getVoxeetSessionParticipantId,
+  invokeMuteAttendeeCommand,
   purgeVoxeetConference,
   raiseHandInConference,
   requestConferenceSpeakerAccess,
   toggleMuteAttendee,
+  invokeUnMuteAttendeeCommand,
   unRaiseHandInConference,
 } from "../core/voxeet/sdk";
 import Row from "./ui/Row";
@@ -25,7 +27,9 @@ import clsx from "clsx";
 import {
   useOnDenySpeakerAccess,
   useOnGrantSpeakerAccess,
+  useOnMuteAttendee,
   useOnRevokeSpeakerAccess,
+  useOnUnMuteAttendee,
   voxeetHookCallback,
 } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
@@ -88,8 +92,10 @@ const useOnGrantSpeakerAccessCallback = (
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === getVoxeetSessionParticipantId()) {
-        toggleMuteAttendee();
-        muteMike(false);
+        // Todo discuss & add if mike needs to be enabled by default once the member becomes speaker
+        // toggleMuteAttendee();
+        // muteMike(false);
+
         enableMike(true);
         enableRequestSpeakerAccessButton(false);
       }
@@ -106,7 +112,7 @@ const useOnRevokeSpeakerAccessCallback = (
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === getVoxeetSessionParticipantId()) {
-        toggleMuteAttendee();
+        toggleMuteAttendee(undefined, true);
         muteMike(true);
         enableMike(false);
         enableRequestSpeakerAccessButton(true);
@@ -116,15 +122,44 @@ const useOnRevokeSpeakerAccessCallback = (
   );
 };
 
+const useOnMuteAttendeeCallback = (muteMike) => {
+  const participantId = getVoxeetSessionParticipantId();
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === participantId) {
+        const mute = true;
+        muteMike(mute);
+        toggleMuteAttendee(undefined, mute);
+      }
+    },
+    [muteMike]
+  );
+};
+
+const useOnUnMuteAttendeeCallback = (muteMike) => {
+  const participantId = getVoxeetSessionParticipantId();
+  return React.useCallback(
+    (attendeeId: string) => {
+      if (attendeeId === participantId) {
+        const mute = false;
+        muteMike(mute);
+        toggleMuteAttendee(undefined, mute);
+      }
+    },
+    [muteMike]
+  );
+};
+
 const CallPad = ({ ...props }) => {
   const requestSpeakerAccess = () => {
     requestConferenceSpeakerAccess();
     enableRequestSpeakerAccessButton(false);
   };
+  const participantId = getVoxeetSessionParticipantId();
 
   const raiseHand = () => {
     const value = !isHandRaised;
-    const participantId = getVoxeetSessionParticipantId();
+
     if (value) {
       raiseHandInConference(participantId);
       // voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
@@ -147,8 +182,14 @@ const CallPad = ({ ...props }) => {
   ] = useState(true);
 
   const muteMikeCallback = useCallback(() => {
-    toggleMuteAttendee();
-    muteMike(!isMikeMute);
+    const mute = !isMikeMute;
+    if (mute) {
+      invokeMuteAttendeeCommand(participantId);
+      voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, participantId);
+    } else {
+      invokeUnMuteAttendeeCommand(participantId);
+      voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, participantId);
+    }
   }, [isMikeMute]);
 
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
@@ -165,10 +206,14 @@ const CallPad = ({ ...props }) => {
     enableMike,
     enableRequestSpeakerAccessButton
   );
+  const onMuteAttendeeCallback = useOnMuteAttendeeCallback(muteMike);
+  const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(muteMike);
 
   useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
   useOnGrantSpeakerAccess(onGrantSpeakerAccess);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccess);
+  useOnMuteAttendee(onMuteAttendeeCallback);
+  useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
   return (
     <Row className={classes.root}>
@@ -184,12 +229,7 @@ const CallPad = ({ ...props }) => {
         <Box>
           <button
             onClick={muteMikeCallback}
-            className={clsx(
-              classes.iconWrapper,
-              classes.button,
-              "button",
-              isHandRaised && "is-link"
-            )}
+            className={clsx(classes.iconWrapper, classes.button, "button")}
             disabled={attendee.isConferenceCreator ? false : !isMikeEnabled}
           >
             <FontAwesomeIcon

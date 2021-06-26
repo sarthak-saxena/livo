@@ -124,3 +124,25 @@ export const useOnUnRaiseHand = (callback: Function) => {
     );
   }, [callback]);
 };
+
+export const useOnMuteAttendee = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.MuteAttendee,
+      (attendeeId: string) => {
+        callback(attendeeId);
+      }
+    );
+  }, [callback]);
+};
+
+export const useOnUnMuteAttendee = (callback: Function) => {
+  useEffect(() => {
+    voxeetHookCallback.on(
+      VoxeetCommandType.UnMuteAttendee,
+      (attendeeId: string) => {
+        callback(attendeeId);
+      }
+    );
+  }, [callback]);
+};

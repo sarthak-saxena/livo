@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import UserAvatar from "../components/UserAvatar";
 import {
   useOnGrantSpeakerAccess,
+  useOnMuteAttendee,
   useOnRaiseHand,
   useOnRevokeSpeakerAccess,
+  useOnUnMuteAttendee,
   useOnUnRaiseHand,
   useVoxeet,
   useVoxeetStreamAdded,
@@ -94,10 +96,31 @@ const useOnUnRaiseHandCallback = (setHandsRaised, handsRaised) => {
   );
 };
 
+const useOnMuteAttendeeCallback = (micStatus, setMikeStatus) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      micStatus[attendeeId] = true;
+      setMikeStatus(Object.assign({}, micStatus));
+    },
+    [micStatus, setMikeStatus]
+  );
+};
+
+const useOnUnMuteAttendeeCallback = (micStatus, setMikeStatus) => {
+  return React.useCallback(
+    (attendeeId: string) => {
+      micStatus[attendeeId] = false;
+      setMikeStatus(Object.assign({}, micStatus));
+    },
+    [micStatus, setMikeStatus]
+  );
+};
+
 const ConnectedUsers = ({ ...props }) => {
   const classes = useStylesFromThemeFunction(props);
   const { conference } = useVoxeet();
   const [speakers, setSpeakers] = useState({} as { [id: string]: boolean });
+  const [micStatus, setMikeStatus] = useState({} as { [id: string]: boolean });
   const [handsRaised, setHandsRaised] = useState(
     {} as { [id: string]: boolean }
   );
@@ -117,12 +140,22 @@ const ConnectedUsers = ({ ...props }) => {
     setHandsRaised,
     handsRaised
   );
+  const onMuteAttendeeCallback = useOnMuteAttendeeCallback(
+    micStatus,
+    setMikeStatus
+  );
+  const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(
+    micStatus,
+    setMikeStatus
+  );
 
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onGrantSpeakerAccessCallback);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccessCallback);
   useOnRaiseHand(onRaiseHandCallback);
   useOnUnRaiseHand(onUnRaiseHandCallback);
+  useOnMuteAttendee(onMuteAttendeeCallback);
+  useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
   useEffect(() => {
     const attendees = Array.from(
@@ -147,6 +180,7 @@ const ConnectedUsers = ({ ...props }) => {
                   <UserAvatar
                     isHandRaised={handsRaised[voxeetAttendee.id]}
                     attendee={voxeetAttendee}
+                    isMuted={micStatus[voxeetAttendee.id]}
                   />
                 </Column>
               );
@@ -166,6 +200,7 @@ const ConnectedUsers = ({ ...props }) => {
                   <UserAvatar
                     isHandRaised={handsRaised[voxeetAttendee.id]}
                     attendee={voxeetAttendee}
+                    isMuted={micStatus[voxeetAttendee.id]}
                   />
                 </Column>
               );

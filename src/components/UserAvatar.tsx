@@ -26,14 +26,14 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
 interface Props {
   attendee: Participant;
   isHandRaised: boolean;
+  isMuted?: boolean;
 }
 
-const UserAvatar = ({ attendee, isHandRaised, ...props }: Props) => {
-  const [isMikeMute, muteMike] = useState(true);
-
+const UserAvatar = ({ attendee, isHandRaised, isMuted, ...props }: Props) => {
   const classes = useStylesFromThemeFunction(props);
-
+  const isMikeMute = isMuted === undefined ? true : isMuted;
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
+
   return (
     <Box className={classes.container}>
       <Avatar>{getShortHandName(attendee.info.name)}</Avatar>
