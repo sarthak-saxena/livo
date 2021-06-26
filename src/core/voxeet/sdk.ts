@@ -5,8 +5,10 @@ import { JoinOptions } from "@voxeet/voxeet-web-sdk/types/models/Options";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { voxeetHookCallback } from "../../services/hooks/voxeetHook";
+import DataStore from "../dataStore";
 
 const CommandingEventSeparator = "^_^";
+const dataStore = new DataStore();
 
 export const initializeVoxeet = async (
   config: SdkAPIConfig,
@@ -139,14 +141,13 @@ export const addEventlistenersForCommanding = () => {
     data = data.split(CommandingEventSeparator);
     const message = data[0];
     const attendeeId = data[1];
+    dataStore.update(message, attendeeId);
     switch (message) {
       case VoxeetCommandType.RequestSpeakerAccess:
         voxeetHookCallback.call(
           VoxeetCommandType.RequestSpeakerAccess,
           participantWhoEmittedEvent
         );
-        break;
-      case VoxeetCommandType.RemoveSpeaker:
         break;
       case VoxeetCommandType.GrantSpeakerAccess:
         voxeetHookCallback.call(

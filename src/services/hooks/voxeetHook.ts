@@ -4,7 +4,7 @@ import { VoxeetContextType } from "../../types/context";
 import { VoxeetCommandType, VoxeetConferenceEvents } from "../../types/Voxeet";
 import VoxeetSdk from "@voxeet/voxeet-web-sdk";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
-import CallbackEventListener from "../../core/callback";
+import CallbackEventListener from "../../core/callbackEventListener";
 
 const conference = VoxeetSdk.conference;
 export const useVoxeet: () => VoxeetContextType = () => {

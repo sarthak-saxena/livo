@@ -33,7 +33,6 @@ export interface VoxeetParticipant extends Participant {
 
 export enum VoxeetCommandType {
   RequestSpeakerAccess = "RequestSpeakerAccess",
-  RemoveSpeaker = "RemoveSpeaker",
   GrantSpeakerAccess = "GrantSpeakerAccess",
   RevokeSpeakerAccess = "RevokeSpeakerAccess",
   DenySpeakerAccess = "DenySpeakerAccess",
