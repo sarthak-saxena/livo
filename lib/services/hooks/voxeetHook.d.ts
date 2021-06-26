@@ -1,0 +1,17 @@
+import { VoxeetContextType } from "../../types/context";
+import { VoxeetConferenceEvents } from "../../types/Voxeet";
+import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
+import CallbackEventListener from "../../core/callbackEventListener";
+export declare const useVoxeet: () => VoxeetContextType;
+export declare const voxeetHookCallback: CallbackEventListener;
+declare type StreamAddedCallback = (participant: Participant, stream: MediaStream, event: VoxeetConferenceEvents) => void;
+export declare const useVoxeetStreamAdded: (callback: StreamAddedCallback, onAttendeeAddCallback?: (participant: Participant, event: VoxeetConferenceEvents) => void) => void;
+export declare const useOnRequestSpeakerAccess: (callback: Function) => void;
+export declare const useOnGrantSpeakerAccess: (callback: Function) => void;
+export declare const useOnRevokeSpeakerAccess: (callback: Function) => void;
+export declare const useOnDenySpeakerAccess: (callback: Function) => void;
+export declare const useOnRaiseHand: (callback: Function) => void;
+export declare const useOnUnRaiseHand: (callback: Function) => void;
+export declare const useOnMuteAttendee: (callback: Function) => void;
+export declare const useOnUnMuteAttendee: (callback: Function) => void;
+export {};
