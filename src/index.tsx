@@ -9,6 +9,10 @@ const url = new URL((window as any).location);
 const attendee = {
   ...SampleAttendee,
   isConferenceCreator: Boolean(url.searchParams.get("creator")),
+  name: url.searchParams.get("id")
+    ? `User ${url.searchParams.get("id")}`
+    : SampleAttendee.name,
+  id: url.searchParams.get("id") || SampleAttendee.id,
 };
 
 ReactDOM.render(
