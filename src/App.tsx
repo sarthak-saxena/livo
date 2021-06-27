@@ -5,7 +5,7 @@ import {
   VoxeetConferenceEvents,
   SdkAPIConfig,
 } from "./types/Voxeet";
-import { initializeVoxeet } from "./core/voxeet/sdk";
+import { initializeVoxeet, purgeVoxeetConference } from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
@@ -65,6 +65,9 @@ export const App = ({
       .catch((error) => {
         onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
       });
+    return function cleanup() {
+      purgeVoxeetConference();
+    };
   }, [
     apiConfig,
     attendee,

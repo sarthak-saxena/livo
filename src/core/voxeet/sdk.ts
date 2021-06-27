@@ -37,7 +37,7 @@ export const initializeVoxeet = async (
 };
 
 const controlMuteState = () => {
-  toggleMuteAttendee();
+  toggleMuteAttendee(undefined, false);
 };
 
 export const purgeVoxeetSession = async () => {
