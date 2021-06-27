@@ -5,10 +5,9 @@ import { JoinOptions } from "@voxeet/voxeet-web-sdk/types/models/Options";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { voxeetHookCallback } from "../../services/hooks/voxeetHook";
-import DataStore from "../dataStore";
+import { dataStore } from "../../App";
 
 const CommandingEventSeparator = "^_^";
-const dataStore = new DataStore();
 
 export const initializeVoxeet = async (
   config: SdkAPIConfig,
@@ -27,7 +26,7 @@ export const initializeVoxeet = async (
     console.log("conference joined with participants", conference.participants);
 
     // add event listeners for commanding
-    addEventlistenersForCommanding();
+    addEventlistenersForCommanding(creator.isConferenceCreator);
 
     // Important: disable mute initially for every attendee
     controlMuteState();
@@ -152,13 +151,30 @@ export const unRaiseHandInConference = (attendeeId: string) => {
   );
 };
 
-export const addEventlistenersForCommanding = () => {
+export const requestDataSync = (attendeeId: string) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.RequestDataSync}${CommandingEventSeparator}${attendeeId}`
+  );
+};
+
+export const responseDataSync = (
+  attendeeId: string,
+  strngifiedResponse: string
+) => {
+  VoxeetSdk.command.send(
+    `${VoxeetCommandType.ResponseDataSync}${CommandingEventSeparator}${attendeeId}${CommandingEventSeparator}${strngifiedResponse}`
+  );
+};
+
+export const addEventlistenersForCommanding = (
+  isConferenceCreator?: boolean
+) => {
   const participant = VoxeetSdk.session.participant;
   VoxeetSdk.command.on("received", (participantWhoEmittedEvent, data) => {
     data = data.split(CommandingEventSeparator);
     const message = data[0];
     const attendeeId = data[1];
-    dataStore.update(message, attendeeId);
+    const payload = data[2];
     switch (message) {
       case VoxeetCommandType.RequestSpeakerAccess:
         voxeetHookCallback.call(
@@ -197,6 +213,17 @@ export const addEventlistenersForCommanding = () => {
         break;
       case VoxeetCommandType.UnMuteAttendee:
         voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, attendeeId);
+        break;
+      case VoxeetCommandType.RequestDataSync:
+        responseDataSync(attendeeId, JSON.stringify(dataStore.getData()));
+        break;
+      case VoxeetCommandType.ResponseDataSync:
+        if (attendeeId === participant.id && payload) {
+          dataStore.dataSyncCallback.call(
+            VoxeetCommandType.ResponseDataSync,
+            JSON.parse(payload)
+          );
+        }
         break;
       default:
         console.error("Unknown command type");

@@ -11,7 +11,7 @@ export const useVoxeet: () => VoxeetContextType = () => {
   return useContext(VoxeetContext);
 };
 
-export const voxeetHookCallback = new CallbackEventListener();
+export const voxeetHookCallback = new CallbackEventListener(true);
 
 type StreamAddedCallback = (
   participant: Participant,
