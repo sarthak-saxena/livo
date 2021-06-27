@@ -1,11 +1,10 @@
-interface Props {
-}
+import { VoxeetCommandType } from "../types/Voxeet";
 export default class CallbackEventListener {
     listeners: {
         [name: string]: Function[];
     };
-    constructor(props?: Props);
+    private readonly updateDataStore;
+    constructor(updateDataStore?: boolean);
     on: (eventListenerName: string, listener: Function) => void;
-    call: (eventListenerName: string, params?: any) => void;
+    call: (eventListenerName: VoxeetCommandType, params?: any) => void;
 }
-export {};

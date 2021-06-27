@@ -4,6 +4,8 @@ import { VoxeetAttendee, VoxeetConferenceEvents, SdkAPIConfig } from "./types/Vo
 import { Attendee, Room } from "./types/Conference";
 import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import "./styles/index.sass";
+import DataStore from "./core/dataStore";
+export declare const dataStore: DataStore;
 interface Props {
     mode: ConferenceMode;
     apiConfig: SdkAPIConfig;
