@@ -188,10 +188,10 @@ const CallPad = ({ ...props }) => {
 
     if (value) {
       raiseHandInConference(participantId);
-      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
+      // voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
+      // voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);
