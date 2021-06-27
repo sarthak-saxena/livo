@@ -134,7 +134,7 @@ const useOnMuteAttendeeCallback = (muteMike) => {
         toggleMuteAttendee(undefined, mute);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -148,7 +148,7 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
         toggleMuteAttendee(undefined, mute);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -223,7 +223,7 @@ const CallPad = ({ ...props }) => {
       invokeUnMuteAttendeeCommand(participantId);
       voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, participantId);
     }
-  }, [isMikeMute]);
+  }, [isMikeMute, participantId]);
 
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   const onDenySpeakerAccessCallback = useOnDenySpeakerAccessCallback(

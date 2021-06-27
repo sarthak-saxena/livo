@@ -98,11 +98,11 @@ export const toggleMuteAttendee = (
   );
 };
 
-export const isAttendeeMuted = (): boolean => VoxeetSdk.conference.isMuted();
-
-const muteAttendee = (participant: Participant, isMuted: boolean) => {
-  VoxeetSdk.conference.mute(participant, isMuted);
-};
+// export const isAttendeeMuted = (): boolean => VoxeetSdk.conference.isMuted();
+//
+// const muteAttendee = (participant: Participant, isMuted: boolean) => {
+//   VoxeetSdk.conference.mute(participant, isMuted);
+// };
 
 export const requestConferenceSpeakerAccess = () => {
   VoxeetSdk.command.send(

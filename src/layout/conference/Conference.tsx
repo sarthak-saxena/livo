@@ -1,7 +1,6 @@
 import React from "react";
 import ConnectedUsers from "../ConnectedUsers";
 import CallPad from "../../components/Callpad";
-import Box from "../../components/ui/Box";
 import { createUseStyles } from "react-jss";
 import clsx from "clsx";
 import Column from "../../components/ui/Column";

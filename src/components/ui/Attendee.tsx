@@ -67,7 +67,7 @@ const useOnMuteAttendeeCallback = (muteMike, participantId: string) => {
         muteMike(true);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -78,7 +78,7 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
         muteMike(false);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
