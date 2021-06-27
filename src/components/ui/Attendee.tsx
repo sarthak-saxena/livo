@@ -82,6 +82,22 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
   );
 };
 
+const useDataFromDataSync = (attendee: Participant) => {
+  let enableMakeSpeakerButtonDefault = true,
+    muteMikeDefault = true;
+
+  const dataSync = useDataSync();
+  const attendeeDataSync = dataSync[attendee.id];
+  if (attendeeDataSync) {
+    enableMakeSpeakerButtonDefault =
+      attendeeDataSync.speaker === undefined
+        ? enableMakeSpeakerButtonDefault
+        : !attendeeDataSync.speaker;
+    muteMikeDefault = attendeeDataSync.mute || muteMikeDefault;
+  }
+  return { enableMakeSpeakerButtonDefault, muteMikeDefault };
+};
+
 export const Attendee = ({
   attendee,
   isConferenceCreator,
@@ -121,18 +137,10 @@ export const Attendee = ({
     }
   };
 
-  let enableMakeSpeakerButtonDefault = true,
-    muteMikeDefault = true;
-
-  const dataSync = useDataSync();
-  const attendeeDataSync = dataSync[attendee.id];
-  if (attendeeDataSync) {
-    enableMakeSpeakerButtonDefault =
-      attendeeDataSync.speaker === undefined
-        ? enableMakeSpeakerButtonDefault
-        : !attendeeDataSync.speaker;
-    muteMikeDefault = attendeeDataSync.mute || muteMikeDefault;
-  }
+  const {
+    enableMakeSpeakerButtonDefault,
+    muteMikeDefault,
+  } = useDataFromDataSync(attendee);
 
   const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(
     enableMakeSpeakerButtonDefault

@@ -151,6 +151,31 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
   );
 };
 
+const useDataFromDataSync = (participantId: string) => {
+  const { attendee } = useAttendee();
+  const dataSync = useDataSync();
+  let setHandRaisedDefault = false,
+    muteMikeDefault = true,
+    enableMikeDefault = attendee.isConferenceCreator,
+    requestSpeakerAccessButtonEnabledDefault = true;
+  if (dataSync[participantId]) {
+    const state = dataSync[participantId];
+    setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
+    muteMikeDefault = state.mute || muteMikeDefault;
+    enableMikeDefault = state.speaker || enableMikeDefault;
+    requestSpeakerAccessButtonEnabledDefault =
+      state.speaker === undefined
+        ? requestSpeakerAccessButtonEnabledDefault
+        : !state.speaker;
+  }
+  return {
+    setHandRaisedDefault,
+    muteMikeDefault,
+    enableMikeDefault,
+    requestSpeakerAccessButtonEnabledDefault,
+  };
+};
+
 const CallPad = ({ ...props }) => {
   const requestSpeakerAccess = () => {
     requestConferenceSpeakerAccess();
@@ -173,25 +198,13 @@ const CallPad = ({ ...props }) => {
   };
 
   const { attendee } = useAttendee();
-  const dataSync = useDataSync();
-  let setHandRaisedDefault = false,
-    muteMikeDefault = true,
-    enableMikeDefault = attendee.isConferenceCreator,
-    requestSpeakerAccessButtonEnabledDefault = true;
-
-  if (dataSync[participantId]) {
-    const state = dataSync[participantId];
-    setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
-    muteMikeDefault = state.mute || muteMikeDefault;
-    enableMikeDefault = state.speaker || enableMikeDefault;
-    requestSpeakerAccessButtonEnabledDefault =
-      state.speaker === undefined
-        ? requestSpeakerAccessButtonEnabledDefault
-        : !state.speaker;
-  }
-
+  const {
+    setHandRaisedDefault,
+    muteMikeDefault,
+    enableMikeDefault,
+    requestSpeakerAccessButtonEnabledDefault,
+  } = useDataFromDataSync(participantId);
   const classes = useStylesFromThemeFunction(props);
-
   const [isHandRaised, setHandRaised] = useState(setHandRaisedDefault);
   const [isMikeMute, muteMike] = useState(muteMikeDefault);
   const [isMikeEnabled, enableMike] = useState(enableMikeDefault);
