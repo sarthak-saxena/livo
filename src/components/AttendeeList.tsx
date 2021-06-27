@@ -47,6 +47,7 @@ export const AttendeeList = ({ ...props }) => {
       ) as Participant[];
       setAttendees(attendees);
     };
+    sync();
 
     // Todo Fix hack - add logic for resync
     setTimeout(sync, 1000);
