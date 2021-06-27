@@ -26,6 +26,7 @@ import {
 } from "../../services/hooks/voxeetHook";
 import { VoxeetCommandType } from "../../types/Voxeet";
 import { getShortHandName } from "../../core/Utilities";
+import { useDataSync } from "../../services/hooks/dataSyncHook";
 
 interface Props {
   attendee: Participant;
@@ -81,6 +82,22 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
   );
 };
 
+const useDataFromDataSync = (attendee: Participant) => {
+  let enableMakeSpeakerButtonDefault = true,
+    muteMikeDefault = true;
+
+  const dataSync = useDataSync();
+  const attendeeDataSync = dataSync[attendee.id];
+  if (attendeeDataSync) {
+    enableMakeSpeakerButtonDefault =
+      attendeeDataSync.speaker === undefined
+        ? enableMakeSpeakerButtonDefault
+        : !attendeeDataSync.speaker;
+    muteMikeDefault = attendeeDataSync.mute || muteMikeDefault;
+  }
+  return { enableMakeSpeakerButtonDefault, muteMikeDefault };
+};
+
 export const Attendee = ({
   attendee,
   isConferenceCreator,
@@ -120,8 +137,15 @@ export const Attendee = ({
     }
   };
 
-  const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(true);
-  const [isMikeMute, muteMike] = useState(true);
+  const {
+    enableMakeSpeakerButtonDefault,
+    muteMikeDefault,
+  } = useDataFromDataSync(attendee);
+
+  const [isMakeSpeakerButtonEnabled, enableMakeSpeakerButton] = useState(
+    enableMakeSpeakerButtonDefault
+  );
+  const [isMikeMute, muteMike] = useState(muteMikeDefault as boolean);
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   const classes = useStylesFromThemeFunction(props);
   const onOnGrantSpeakerAccessCallback = useOnOnGrantSpeakerAccessCallback(

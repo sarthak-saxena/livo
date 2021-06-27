@@ -40,4 +40,6 @@ export enum VoxeetCommandType {
   DenySpeakerAccess = "DenySpeakerAccess",
   RaiseHand = "RaiseHand",
   unRaiseHand = "unRaiseHand",
+  RequestDataSync = "RequestDataSync",
+  ResponseDataSync = "ResponseDataSync",
 }

@@ -41,10 +41,16 @@ export const AttendeeList = ({ ...props }) => {
   useVoxeetStreamAdded(callback);
 
   useEffect(() => {
-    const attendees = Array.from(
-      conference ? conference.participants.values() : []
-    ) as Participant[];
-    setAttendees(attendees);
+    const sync = () => {
+      const attendees = Array.from(
+        conference ? conference.participants.values() : []
+      ) as Participant[];
+      setAttendees(attendees);
+    };
+    sync();
+
+    // Todo Fix hack - add logic for resync
+    setTimeout(sync, 1000);
   }, [conference]);
 
   return (

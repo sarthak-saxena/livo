@@ -34,6 +34,8 @@ import {
 } from "../services/hooks/voxeetHook";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
+import { useDataSync } from "../services/hooks/dataSyncHook";
+import { dataStore } from "../App";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -100,7 +102,7 @@ const useOnGrantSpeakerAccessCallback = (
         enableRequestSpeakerAccessButton(false);
       }
     },
-    [muteMike, enableMike]
+    [muteMike, enableMike, enableRequestSpeakerAccessButton]
   );
 };
 
@@ -118,7 +120,7 @@ const useOnRevokeSpeakerAccessCallback = (
         enableRequestSpeakerAccessButton(true);
       }
     },
-    [muteMike, enableMike]
+    [muteMike, enableMike, enableRequestSpeakerAccessButton]
   );
 };
 
@@ -150,6 +152,31 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
   );
 };
 
+const useDataFromDataSync = (participantId: string) => {
+  const { attendee } = useAttendee();
+  const dataSync = useDataSync();
+  let setHandRaisedDefault = false,
+    muteMikeDefault = true,
+    enableMikeDefault = attendee.isConferenceCreator,
+    requestSpeakerAccessButtonEnabledDefault = true;
+  if (dataSync[participantId]) {
+    const state = dataSync[participantId];
+    setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
+    muteMikeDefault = state.mute || muteMikeDefault;
+    enableMikeDefault = state.speaker || enableMikeDefault;
+    requestSpeakerAccessButtonEnabledDefault =
+      state.speaker === undefined
+        ? requestSpeakerAccessButtonEnabledDefault
+        : !state.speaker;
+  }
+  return {
+    setHandRaisedDefault,
+    muteMikeDefault,
+    enableMikeDefault,
+    requestSpeakerAccessButtonEnabledDefault,
+  };
+};
+
 const CallPad = ({ ...props }) => {
   const requestSpeakerAccess = () => {
     requestConferenceSpeakerAccess();
@@ -162,24 +189,30 @@ const CallPad = ({ ...props }) => {
 
     if (value) {
       raiseHandInConference(participantId);
-      // voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
+      dataStore.update(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      // voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
+      dataStore.update(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);
   };
 
-  const classes = useStylesFromThemeFunction(props);
   const { attendee } = useAttendee();
-  const [isHandRaised, setHandRaised] = useState(false);
-  const [isMikeMute, muteMike] = useState(true);
-  const [isMikeEnabled, enableMike] = useState(attendee.isConferenceCreator);
+  const {
+    setHandRaisedDefault,
+    muteMikeDefault,
+    enableMikeDefault,
+    requestSpeakerAccessButtonEnabledDefault,
+  } = useDataFromDataSync(participantId);
+  const classes = useStylesFromThemeFunction(props);
+  const [isHandRaised, setHandRaised] = useState(setHandRaisedDefault);
+  const [isMikeMute, muteMike] = useState(muteMikeDefault);
+  const [isMikeEnabled, enableMike] = useState(enableMikeDefault);
   const [
     requestSpeakerAccessButtonEnabled,
     enableRequestSpeakerAccessButton,
-  ] = useState(true);
+  ] = useState(requestSpeakerAccessButtonEnabledDefault);
 
   const muteMikeCallback = useCallback(() => {
     const mute = !isMikeMute;
