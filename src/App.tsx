@@ -14,6 +14,9 @@ import { UserContext } from "./services/context/userContext";
 import { ThemeProvider } from "theming";
 import "./styles/index.sass";
 import Box from "./components/ui/Box";
+import DataStore, { Data } from "./core/dataStore";
+import { DataSyncContext } from "./services/context/dataSyncContext";
+export const dataStore = new DataStore();
 
 const theme = {
   color: "black",
@@ -45,12 +48,16 @@ export const App = ({
   const [conference, setConference] = useState(
     undefined as Conference | undefined
   );
+  const [syncedData, setSyncedData] = useState(undefined as Data | undefined);
 
   useEffect(() => {
     initializeVoxeet(apiConfig, attendee, room)
       .then((conference) => {
         if (conference) {
           setConference(conference);
+          dataStore.synchronise(conference).then((data) => {
+            setSyncedData(data);
+          });
           onAppInitializedSuccessCallback &&
             onAppInitializedSuccessCallback(conference);
         }
@@ -69,14 +76,22 @@ export const App = ({
   return (
     <ThemeProvider theme={theme}>
       <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
-        {conference ? (
+        {conference && syncedData ? (
           <VoxeetContext.Provider value={{ conference }}>
-            <Box className={"app-container"}>
-              <ConferenceContainer mode={mode} />
-            </Box>
+            <DataSyncContext.Provider value={syncedData}>
+              <Box className={"app-container"}>
+                <ConferenceContainer mode={mode} />
+              </Box>
+            </DataSyncContext.Provider>
           </VoxeetContext.Provider>
         ) : (
-          <>Initializing Livo...</>
+          <>{`${
+            !conference
+              ? "Initializing Livo"
+              : !syncedData
+              ? "Synchronising state"
+              : ""
+          }...`}</>
         )}
       </UserContext.Provider>
     </ThemeProvider>

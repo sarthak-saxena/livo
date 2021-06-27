@@ -19,6 +19,7 @@ import Typography from "../components/ui/Typography";
 import Column from "../components/ui/Column";
 import Row from "../components/ui/Row";
 import { isCreator } from "../core/Utilities";
+import { useDataSync } from "../services/hooks/dataSyncHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -116,13 +117,40 @@ const useOnUnMuteAttendeeCallback = (micStatus, setMikeStatus) => {
   );
 };
 
+const useSyncFromDataSync = (): {
+  syncedSpeakers: { [id: string]: boolean };
+  syncedMicStatus: { [id: string]: boolean };
+  syncedHandsRaised: { [id: string]: boolean };
+} => {
+  const dataSync = useDataSync();
+  const syncedSpeakers = {};
+  const syncedMicStatus = {};
+  const syncedHandsRaised = {};
+  for (let attendeeId in dataSync) {
+    const attendee = dataSync[attendeeId];
+    syncedSpeakers[attendeeId] = attendee.speaker;
+    syncedMicStatus[attendeeId] = attendee.mute;
+    syncedHandsRaised[attendeeId] = attendee.handRaised;
+  }
+  return { syncedSpeakers, syncedMicStatus, syncedHandsRaised };
+};
+
 const ConnectedUsers = ({ ...props }) => {
   const classes = useStylesFromThemeFunction(props);
   const { conference } = useVoxeet();
-  const [speakers, setSpeakers] = useState({} as { [id: string]: boolean });
-  const [micStatus, setMikeStatus] = useState({} as { [id: string]: boolean });
+  const {
+    syncedSpeakers,
+    syncedMicStatus,
+    syncedHandsRaised,
+  } = useSyncFromDataSync();
+  const [speakers, setSpeakers] = useState(
+    syncedSpeakers as { [id: string]: boolean }
+  );
+  const [micStatus, setMikeStatus] = useState(
+    syncedMicStatus as { [id: string]: boolean }
+  );
   const [handsRaised, setHandsRaised] = useState(
-    {} as { [id: string]: boolean }
+    syncedHandsRaised as { [id: string]: boolean }
   );
   const { onAttendeeAdd, attendee } = useAttendee();
   const [attendees, setAttendees] = useState([] as Participant[]);
@@ -158,10 +186,15 @@ const ConnectedUsers = ({ ...props }) => {
   useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
   useEffect(() => {
-    const attendees = Array.from(
-      conference ? conference.participants.values() : []
-    ) as Participant[];
-    setAttendees(attendees);
+    const sync = () => {
+      const attendees = Array.from(
+        conference ? conference.participants.values() : []
+      ) as Participant[];
+      setAttendees(attendees);
+    };
+    sync();
+    // Todo Fix hack - add logic for resync
+    setTimeout(sync, 1000);
   }, [conference]);
 
   return (

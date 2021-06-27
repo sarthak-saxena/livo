@@ -1,6 +1,9 @@
 import { VoxeetCommandType } from "../types/Voxeet";
+import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
+import { getVoxeetSessionParticipantId, requestDataSync } from "./voxeet/sdk";
+import CallbackEventListener from "./callbackEventListener";
 
-interface Data {
+export interface Data {
   [attendeeId: string]: {
     speaker: boolean;
     handRaised: boolean;
@@ -10,6 +13,7 @@ interface Data {
 
 export default class DataStore {
   private data: Data = {};
+  dataSyncCallback = new CallbackEventListener();
 
   constructor() {}
 
@@ -43,7 +47,39 @@ export default class DataStore {
     }
   }
 
+  private setData(data: Data) {
+    this.data = data;
+  }
+
   getData = (): Data => {
+    return this.data;
+  };
+
+  requestData = (): Promise<Data> => {
+    const participantId = getVoxeetSessionParticipantId();
+    requestDataSync(participantId);
+    return new Promise((resolve) => {
+      this.dataSyncCallback.on(
+        VoxeetCommandType.ResponseDataSync,
+        (data: Data) => {
+          resolve(data);
+        }
+      );
+    });
+  };
+
+  synchronise = async (conference: Conference): Promise<Data> => {
+    if (conference.participants.size > 1) {
+      try {
+        const data = await this.requestData();
+        this.setData(data);
+      } catch (e) {
+        console.error("Error in synchronising data");
+        this.setData({});
+      }
+    } else {
+      this.setData({});
+    }
     return this.data;
   };
 }

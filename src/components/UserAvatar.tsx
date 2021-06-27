@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { createUseStyles } from "react-jss";
 import Box from "./ui/Box";
@@ -9,7 +9,6 @@ import {
   faMicrophoneSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import Typography from "./ui/Typography";
-import { useOnRaiseHand, useOnUnRaiseHand } from "../services/hooks/voxeetHook";
 import { getShortHandName } from "../core/Utilities";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
