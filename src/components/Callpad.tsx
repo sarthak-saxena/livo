@@ -35,6 +35,7 @@ import {
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
+import { dataStore } from "../App";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -188,10 +189,10 @@ const CallPad = ({ ...props }) => {
 
     if (value) {
       raiseHandInConference(participantId);
-      // voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
+      dataStore.update(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      // voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
+      dataStore.update(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);
