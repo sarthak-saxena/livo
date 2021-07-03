@@ -21,7 +21,12 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
     flexDirection: "column",
   },
   attendeeListWrapper: {
-    position: "relative",
+    "@media (min-width: 500px)": {
+      position: "relative",
+    },
+    "@media (max-width: 500px)": {
+      display: "none",
+    },
   },
 }));
 

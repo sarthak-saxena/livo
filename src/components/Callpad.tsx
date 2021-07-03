@@ -70,6 +70,9 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   requestButton: {
     display: "flex",
     flexDirection: "row-reverse",
+    "@media (max-width: 500px)": {
+      display: "none",
+    },
   },
   button: {
     width: "3.5rem",
@@ -272,9 +275,9 @@ const CallPad = ({ ...props }) => {
             />
           </button>
         </Box>
-        <Box className={classes.iconWrapper}>
-          <FontAwesomeIcon size={"lg"} icon={faSlidersH} />
-        </Box>
+        {/*<Box className={classes.iconWrapper}>*/}
+        {/*  <FontAwesomeIcon size={"lg"} icon={faSlidersH} />*/}
+        {/*</Box>*/}
         <Box>
           <button
             onClick={raiseHand}

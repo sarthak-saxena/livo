@@ -25,7 +25,25 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
     padding: 20,
   },
-  attendeeWrapper: {},
+  attendeesWrapper: {
+    "@media (min-width: 500px)": {
+      display: "block",
+    },
+    "@media (max-width: 500px)": {
+      display: "none",
+    },
+  },
+  callInProgressWrapper: {
+    "@media (max-width: 500px)": {
+      height: "100px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    "@media (min-width: 501px)": {
+      display: "none",
+    },
+  },
 }));
 
 export const useAttendeeAddCallback = (
@@ -201,46 +219,49 @@ const ConnectedUsers = ({ ...props }) => {
     <Box>
       <Column>{/*<UserAvatar  />*/}</Column>
       <Typography>Members Connected: {attendees.length}</Typography>
-      <Row>
-        <Column>
-          <Typography className={"is-size-4"}>Speakers:</Typography>
-        </Column>
+      <Box className={classes.attendeesWrapper}>
         <Row>
-          {attendees.map((voxeetAttendee) => {
-            if (speakers[voxeetAttendee.id] || isCreator(voxeetAttendee)) {
-              return (
-                <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar
-                    isHandRaised={handsRaised[voxeetAttendee.id]}
-                    attendee={voxeetAttendee}
-                    isMuted={micStatus[voxeetAttendee.id]}
-                  />
-                </Column>
-              );
-            }
-          })}
+          <Column>
+            <Typography className={"is-size-4"}>Speakers:</Typography>
+          </Column>
+          <Row>
+            {attendees.map((voxeetAttendee) => {
+              if (speakers[voxeetAttendee.id] || isCreator(voxeetAttendee)) {
+                return (
+                  <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
+                    <UserAvatar
+                      isHandRaised={handsRaised[voxeetAttendee.id]}
+                      attendee={voxeetAttendee}
+                      isMuted={micStatus[voxeetAttendee.id]}
+                    />
+                  </Column>
+                );
+              }
+            })}
+          </Row>
         </Row>
-      </Row>
-      <Row>
-        <Column>
-          <Typography className={"is-size-4"}>Members:</Typography>
-        </Column>
         <Row>
-          {attendees.map((voxeetAttendee) => {
-            if (!speakers[voxeetAttendee.id] && !isCreator(voxeetAttendee)) {
-              return (
-                <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar
-                    isHandRaised={handsRaised[voxeetAttendee.id]}
-                    attendee={voxeetAttendee}
-                    isMuted={micStatus[voxeetAttendee.id]}
-                  />
-                </Column>
-              );
-            }
-          })}
+          <Column>
+            <Typography className={"is-size-4"}>Members:</Typography>
+          </Column>
+          <Row>
+            {attendees.map((voxeetAttendee) => {
+              if (!speakers[voxeetAttendee.id] && !isCreator(voxeetAttendee)) {
+                return (
+                  <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
+                    <UserAvatar
+                      isHandRaised={handsRaised[voxeetAttendee.id]}
+                      attendee={voxeetAttendee}
+                      isMuted={micStatus[voxeetAttendee.id]}
+                    />
+                  </Column>
+                );
+              }
+            })}
+          </Row>
         </Row>
-      </Row>
+      </Box>
+      <Box className={classes.callInProgressWrapper}>Call in progress</Box>
     </Box>
   );
 };
