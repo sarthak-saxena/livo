@@ -16,8 +16,6 @@ export const initializeVoxeet = async (
 ): Promise<Conference | undefined> => {
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
-    // close active voxeet session
-    VoxeetSdk.session.participant && (await purgeVoxeetSession());
     await VoxeetSdk.session.open({
       name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
       externalId: creator.id,
@@ -82,10 +80,6 @@ export const joinConference = async (
 ): Promise<Conference> => {
   try {
     const conference = await VoxeetSdk.conference.fetch(conferenceId);
-    console.log(
-      "conference join link",
-      `${window.location.origin}/?conferenceId=${conferenceId}`
-    );
     return await VoxeetSdk.conference.join(conference, joinOptions);
   } catch (e) {
     throw new Error(e);
