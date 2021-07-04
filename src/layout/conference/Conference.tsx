@@ -45,7 +45,7 @@ const Conference = ({ ...props }) => {
         <Column
           className={clsx(
             "column",
-            "is-two-thirds",
+            !isSmallScreen && "is-two-thirds",
             classes.attendeeAndCallpadContainer
           )}
         >
