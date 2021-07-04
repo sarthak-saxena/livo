@@ -93,7 +93,10 @@ const useDataFromDataSync = (attendee: Participant) => {
       attendeeDataSync.speaker === undefined
         ? enableMakeSpeakerButtonDefault
         : !attendeeDataSync.speaker;
-    muteMikeDefault = attendeeDataSync.mute === undefined ? muteMikeDefault : attendeeDataSync.mute
+    muteMikeDefault =
+      attendeeDataSync.mute === undefined
+        ? muteMikeDefault
+        : attendeeDataSync.mute;
   }
   return { enableMakeSpeakerButtonDefault, muteMikeDefault };
 };

@@ -30,7 +30,8 @@ export const initializeVoxeet = async (
     controlMuteState();
     return conference;
   } catch (e) {
-    alert("Error in joining conference: " + e);
+    console.error("Error in joining conference: " + e);
+    throw e;
   }
 };
 
@@ -49,7 +50,7 @@ export const purgeVoxeetConference = async (onDestroy?: Function) => {
   await VoxeetSdk.conference.leave();
   await purgeVoxeetSession();
   VoxeetSdk.command.off("received", commandListenerCallbacks);
-  onDestroy && onDestroy()
+  onDestroy && onDestroy();
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {

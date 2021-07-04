@@ -37,7 +37,7 @@ interface Props {
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
   onCallDisconnectCallback?: Function;
-  onPurgeComplete?: Function
+  onPurgeComplete?: Function;
 }
 
 interface State {
@@ -45,13 +45,18 @@ interface State {
   syncedData: Data | undefined;
 }
 
+const maxRetryCount = 3;
+const retryInterval = 500; // 0.5 seconds
+
 export class App extends React.Component<Props, State> {
   state = {
     conference: undefined,
     syncedData: undefined,
   };
 
-  componentWillMount() {
+  private retryCount = 0;
+
+  private initConference() {
     const {
       apiConfig,
       attendee,
@@ -71,8 +76,20 @@ export class App extends React.Component<Props, State> {
         }
       })
       .catch((error) => {
-        onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
+        if (this.retryCount <= 3) {
+          setTimeout(() => {
+            this.initConference();
+            this.retryCount++;
+          }, retryInterval);
+        } else {
+          alert(error);
+          onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
+        }
       });
+  }
+
+  componentWillMount() {
+    this.initConference();
   }
 
   componentWillUnmount() {
