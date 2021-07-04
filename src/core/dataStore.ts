@@ -15,7 +15,7 @@ export default class DataStore {
   private data: Data = {};
   dataSyncCallback = new CallbackEventListener();
 
-  constructor() {}
+  // constructor() {}
 
   update(command: VoxeetCommandType, attendeeId: string) {
     if (!this.data[attendeeId]) {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   getVoxeetSessionParticipantId,
   invokeMuteAttendeeCommand,
@@ -36,6 +36,10 @@ import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
 import { dataStore } from "../App";
+import {
+  useOnResizeMediaCallback,
+  useResizeMediaObserver,
+} from "../services/hooks/resizeMediaObserverHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -67,9 +71,12 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  requestButton: {
+  requestButtonLg: {
     display: "flex",
     flexDirection: "row-reverse",
+  },
+  requestButtonSm: {
+    display: "none",
   },
   button: {
     width: "3.5rem",
@@ -134,7 +141,7 @@ const useOnMuteAttendeeCallback = (muteMike) => {
         toggleMuteAttendee(undefined, mute);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -148,7 +155,7 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
         toggleMuteAttendee(undefined, mute);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -189,16 +196,16 @@ const CallPad = ({ ...props }) => {
 
     if (value) {
       raiseHandInConference(participantId);
-      dataStore.update(VoxeetCommandType.RaiseHand, participantId);
+      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      dataStore.update(VoxeetCommandType.unRaiseHand, participantId);
+      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);
   };
 
-  const { attendee } = useAttendee();
+  const { attendee, onCallDisconnectCallback } = useAttendee();
   const {
     setHandRaisedDefault,
     muteMikeDefault,
@@ -213,6 +220,7 @@ const CallPad = ({ ...props }) => {
     requestSpeakerAccessButtonEnabled,
     enableRequestSpeakerAccessButton,
   ] = useState(requestSpeakerAccessButtonEnabledDefault);
+  const [isSmallScreen, setSmallScreen] = useState(false);
 
   const muteMikeCallback = useCallback(() => {
     const mute = !isMikeMute;
@@ -223,7 +231,7 @@ const CallPad = ({ ...props }) => {
       invokeUnMuteAttendeeCommand(participantId);
       voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, participantId);
     }
-  }, [isMikeMute]);
+  }, [isMikeMute, participantId]);
 
   const Icon = isMikeMute ? faMicrophoneSlash : faMicrophone;
   const onDenySpeakerAccessCallback = useOnDenySpeakerAccessCallback(
@@ -241,6 +249,7 @@ const CallPad = ({ ...props }) => {
   );
   const onMuteAttendeeCallback = useOnMuteAttendeeCallback(muteMike);
   const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(muteMike);
+  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
   useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
   useOnGrantSpeakerAccess(onGrantSpeakerAccess);
@@ -248,11 +257,14 @@ const CallPad = ({ ...props }) => {
   useOnMuteAttendee(onMuteAttendeeCallback);
   useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
+  useResizeMediaObserver(onResizeMediaCallback);
+
   return (
     <Row className={classes.root}>
       <Column className={clsx("is-two-thirds", classes.configWrapper)}>
         <Box
           onClick={() => {
+            onCallDisconnectCallback && onCallDisconnectCallback();
             purgeVoxeetConference();
           }}
           className={classes.iconWrapper}
@@ -272,9 +284,9 @@ const CallPad = ({ ...props }) => {
             />
           </button>
         </Box>
-        <Box className={classes.iconWrapper}>
-          <FontAwesomeIcon size={"lg"} icon={faSlidersH} />
-        </Box>
+        {/*<Box className={classes.iconWrapper}>*/}
+        {/*  <FontAwesomeIcon size={"lg"} icon={faSlidersH} />*/}
+        {/*</Box>*/}
         <Box>
           <button
             onClick={raiseHand}
@@ -294,7 +306,11 @@ const CallPad = ({ ...props }) => {
         </Box>
       </Column>
       {!attendee.isConferenceCreator && (
-        <Column className={classes.requestButton}>
+        <Column
+          className={
+            isSmallScreen ? classes.requestButtonSm : classes.requestButtonLg
+          }
+        >
           <Box>
             <Button
               disabled={!requestSpeakerAccessButtonEnabled}

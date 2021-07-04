@@ -36,8 +36,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier": "prettier --write '{src,test}/**/*.{js,ts,less,css,tsx,jsx}'",
-	"copy-files": "cp ./src/styles ./lib/",
-	"postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
+    "copy-files": "cp ./src/styles ./lib/",
+    "postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
   },
   "eslintConfig": {
     "extends": [

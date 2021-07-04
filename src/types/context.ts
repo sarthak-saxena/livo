@@ -13,6 +13,7 @@ export interface UserContextType {
     participant: VoxeetAttendee,
     event: VoxeetConferenceEvents
   ) => void;
+  onCallDisconnectCallback?: Function;
 }
 
 export interface DataSyncContextType extends Data {}

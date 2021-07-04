@@ -20,12 +20,32 @@ import Column from "../components/ui/Column";
 import Row from "../components/ui/Row";
 import { isCreator } from "../core/Utilities";
 import { useDataSync } from "../services/hooks/dataSyncHook";
+import {
+  useOnResizeMediaCallback,
+  useResizeMediaObserver,
+} from "../services/hooks/resizeMediaObserverHook";
+import { getVoxeetSessionParticipants } from "../core/voxeet/sdk";
+import VoxeetSdk from "@voxeet/voxeet-web-sdk";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
     padding: 20,
   },
-  attendeeWrapper: {},
+  attendeesWrapperLg: {
+    display: "block",
+  },
+  attendeesWrapperSm: {
+    display: "none",
+  },
+  callInProgressWrapperSm: {
+    height: "100px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  callInProgressWrapperLg: {
+    display: "none",
+  },
 }));
 
 export const useAttendeeAddCallback = (
@@ -38,20 +58,9 @@ export const useAttendeeAddCallback = (
       stream: MediaStream,
       eventType: VoxeetConferenceEvents
     ) => {
-      const attendeesLength = attendees.length;
-      const index = attendees.findIndex((a) => a.id === participant.id);
-      if (eventType === VoxeetConferenceEvents.StreamAdded) {
-        if (index === -1) {
-          attendees.push(participant);
-        }
-      } else if (eventType === VoxeetConferenceEvents.StreamRemoved) {
-        if (index !== -1) {
-          attendees.splice(index, 1);
-        }
-      }
-      if (attendeesLength !== attendees.length) {
-        setAttendees(Object.assign([], attendees));
-      }
+      setTimeout(() => {
+        setAttendees(Object.assign([], getVoxeetSessionParticipants()));
+      })
     },
     [attendees, setAttendees]
   );
@@ -143,6 +152,7 @@ const ConnectedUsers = ({ ...props }) => {
     syncedMicStatus,
     syncedHandsRaised,
   } = useSyncFromDataSync();
+  const [isSmallScreen, setSmallScreen] = useState(false);
   const [speakers, setSpeakers] = useState(
     syncedSpeakers as { [id: string]: boolean }
   );
@@ -176,7 +186,9 @@ const ConnectedUsers = ({ ...props }) => {
     micStatus,
     setMikeStatus
   );
+  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
+  useResizeMediaObserver(onResizeMediaCallback);
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onGrantSpeakerAccessCallback);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccessCallback);
@@ -196,51 +208,67 @@ const ConnectedUsers = ({ ...props }) => {
     // Todo Fix hack - add logic for resync
     setTimeout(sync, 1000);
   }, [conference]);
-
   return (
     <Box>
       <Column>{/*<UserAvatar  />*/}</Column>
       <Typography>Members Connected: {attendees.length}</Typography>
-      <Row>
-        <Column>
-          <Typography className={"is-size-4"}>Speakers:</Typography>
-        </Column>
+      <Box
+        className={
+          isSmallScreen
+            ? classes.attendeesWrapperSm
+            : classes.attendeesWrapperLg
+        }
+      >
         <Row>
-          {attendees.map((voxeetAttendee) => {
-            if (speakers[voxeetAttendee.id] || isCreator(voxeetAttendee)) {
-              return (
-                <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar
-                    isHandRaised={handsRaised[voxeetAttendee.id]}
-                    attendee={voxeetAttendee}
-                    isMuted={micStatus[voxeetAttendee.id]}
-                  />
-                </Column>
-              );
-            }
-          })}
+          <Column>
+            <Typography className={"is-size-4"}>Speakers:</Typography>
+          </Column>
+          <Row>
+            {attendees.map((voxeetAttendee) => {
+              if (speakers[voxeetAttendee.id] || isCreator(voxeetAttendee)) {
+                return (
+                  <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
+                    <UserAvatar
+                      isHandRaised={handsRaised[voxeetAttendee.id]}
+                      attendee={voxeetAttendee}
+                      isMuted={micStatus[voxeetAttendee.id]}
+                    />
+                  </Column>
+                );
+              }
+            })}
+          </Row>
         </Row>
-      </Row>
-      <Row>
-        <Column>
-          <Typography className={"is-size-4"}>Members:</Typography>
-        </Column>
         <Row>
-          {attendees.map((voxeetAttendee) => {
-            if (!speakers[voxeetAttendee.id] && !isCreator(voxeetAttendee)) {
-              return (
-                <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
-                  <UserAvatar
-                    isHandRaised={handsRaised[voxeetAttendee.id]}
-                    attendee={voxeetAttendee}
-                    isMuted={micStatus[voxeetAttendee.id]}
-                  />
-                </Column>
-              );
-            }
-          })}
+          <Column>
+            <Typography className={"is-size-4"}>Members:</Typography>
+          </Column>
+          <Row>
+            {attendees.map((voxeetAttendee) => {
+              if (!speakers[voxeetAttendee.id] && !isCreator(voxeetAttendee)) {
+                return (
+                  <Column className={"is-one-fifth"} key={voxeetAttendee.id}>
+                    <UserAvatar
+                      isHandRaised={handsRaised[voxeetAttendee.id]}
+                      attendee={voxeetAttendee}
+                      isMuted={micStatus[voxeetAttendee.id]}
+                    />
+                  </Column>
+                );
+              }
+            })}
+          </Row>
         </Row>
-      </Row>
+      </Box>
+      <Box
+        className={
+          isSmallScreen
+            ? classes.callInProgressWrapperSm
+            : classes.callInProgressWrapperLg
+        }
+      >
+        Call {attendees.length > 0 ? "in progress" : "disconnected"}
+      </Box>
     </Box>
   );
 };

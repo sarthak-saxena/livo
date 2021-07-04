@@ -67,7 +67,7 @@ const useOnMuteAttendeeCallback = (muteMike, participantId: string) => {
         muteMike(true);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -78,7 +78,7 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
         muteMike(false);
       }
     },
-    [muteMike]
+    [muteMike, participantId]
   );
 };
 
@@ -93,7 +93,10 @@ const useDataFromDataSync = (attendee: Participant) => {
       attendeeDataSync.speaker === undefined
         ? enableMakeSpeakerButtonDefault
         : !attendeeDataSync.speaker;
-    muteMikeDefault = attendeeDataSync.mute || muteMikeDefault;
+    muteMikeDefault =
+      attendeeDataSync.mute === undefined
+        ? muteMikeDefault
+        : attendeeDataSync.mute;
   }
   return { enableMakeSpeakerButtonDefault, muteMikeDefault };
 };

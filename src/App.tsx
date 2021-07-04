@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ConferenceMode } from "./types/App";
 import {
   VoxeetAttendee,
@@ -23,6 +23,8 @@ const theme = {
   background: "white",
 };
 
+export const LivoAppContainer = "livo-app-container";
+
 interface Props {
   mode: ConferenceMode;
   apiConfig: SdkAPIConfig;
@@ -34,69 +36,98 @@ interface Props {
   ) => void;
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
+  onCallDisconnectCallback?: Function;
+  onPurgeComplete?: Function;
 }
 
-export const App = ({
-  mode,
-  apiConfig,
-  attendee,
-  room,
-  onAttendeeAdd,
-  onAppInitializedSuccessCallback,
-  onAppInitializedErrorCallback,
-}: Props) => {
-  const [conference, setConference] = useState(
-    undefined as Conference | undefined
-  );
-  const [syncedData, setSyncedData] = useState(undefined as Data | undefined);
+interface State {
+  conference: Conference | undefined;
+  syncedData: Data | undefined;
+}
 
-  useEffect(() => {
+const maxRetryCount = 3;
+const retryInterval = 500; // 0.5 seconds
+
+export class App extends React.Component<Props, State> {
+  state = {
+    conference: undefined,
+    syncedData: undefined,
+  };
+
+  private retryCount = 0;
+
+  private initConference() {
+    const {
+      apiConfig,
+      attendee,
+      room,
+      onAppInitializedSuccessCallback,
+      onAppInitializedErrorCallback,
+    } = this.props;
     initializeVoxeet(apiConfig, attendee, room)
       .then((conference) => {
         if (conference) {
-          setConference(conference);
-          dataStore.synchronise(conference).then((data) => {
-            setSyncedData(data);
+          this.setState({ conference });
+          dataStore.synchronise(conference).then((syncedData) => {
+            this.setState({ syncedData });
           });
           onAppInitializedSuccessCallback &&
             onAppInitializedSuccessCallback(conference);
         }
       })
       .catch((error) => {
-        onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
+        if (this.retryCount <= 3) {
+          setTimeout(() => {
+            this.initConference();
+            this.retryCount++;
+          }, retryInterval);
+        } else {
+          alert(error);
+          onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
+        }
       });
-    return function cleanup() {
-      purgeVoxeetConference();
-    };
-  }, [
-    apiConfig,
-    attendee,
-    room,
-    onAppInitializedSuccessCallback,
-    onAppInitializedErrorCallback,
-  ]);
+  }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
-        {conference && syncedData ? (
-          <VoxeetContext.Provider value={{ conference }}>
-            <DataSyncContext.Provider value={syncedData}>
-              <Box className={"app-container"}>
-                <ConferenceContainer mode={mode} />
-              </Box>
-            </DataSyncContext.Provider>
-          </VoxeetContext.Provider>
-        ) : (
-          <>{`${
-            !conference
-              ? "Initializing Livo"
-              : !syncedData
-              ? "Synchronising state"
-              : ""
-          }...`}</>
-        )}
-      </UserContext.Provider>
-    </ThemeProvider>
-  );
-};
+  componentWillMount() {
+    this.initConference();
+  }
+
+  componentWillUnmount() {
+    purgeVoxeetConference(this.props.onPurgeComplete);
+  }
+
+  render() {
+    const {
+      attendee,
+      onAttendeeAdd,
+      onCallDisconnectCallback,
+      mode,
+    } = this.props;
+    const { conference, syncedData } = this.state;
+    return (
+      <ThemeProvider theme={theme}>
+        <UserContext.Provider
+          value={{ attendee, onAttendeeAdd, onCallDisconnectCallback }}
+        >
+          {conference && syncedData ? (
+            <VoxeetContext.Provider value={{ conference }}>
+              <DataSyncContext.Provider value={syncedData}>
+                <Box className={LivoAppContainer}>
+                  <ConferenceContainer mode={mode} />
+                </Box>
+              </DataSyncContext.Provider>
+            </VoxeetContext.Provider>
+          ) : (
+            <Box>{`${
+              !conference
+                ? "Initializing Livo"
+                : !syncedData
+                ? "Synchronising state"
+                : ""
+            }...`}</Box>
+          )}
+        </UserContext.Provider>
+      </ThemeProvider>
+    );
+  }
+}

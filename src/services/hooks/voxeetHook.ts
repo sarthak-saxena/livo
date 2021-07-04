@@ -59,7 +59,7 @@ export const useVoxeetStreamAdded = (
         streamRemoveListener
       );
     };
-  }, [callback, onAttendeeAddCallback]);
+  }, []);
 };
 
 export const useOnRequestSpeakerAccess = (callback: Function) => {
@@ -81,7 +81,7 @@ export const useOnGrantSpeakerAccess = (callback: Function) => {
         callback(attendeeId);
       }
     );
-  }, [callback]);
+  }, []);
 };
 
 export const useOnRevokeSpeakerAccess = (callback: Function) => {
@@ -92,7 +92,7 @@ export const useOnRevokeSpeakerAccess = (callback: Function) => {
         callback(attendeeId);
       }
     );
-  }, [callback]);
+  }, []);
 };
 
 export const useOnDenySpeakerAccess = (callback: Function) => {
@@ -103,7 +103,7 @@ export const useOnDenySpeakerAccess = (callback: Function) => {
         callback(participant);
       }
     );
-  }, [callback]);
+  }, []);
 };
 
 export const useOnRaiseHand = (callback: Function) => {
@@ -111,7 +111,7 @@ export const useOnRaiseHand = (callback: Function) => {
     voxeetHookCallback.on(VoxeetCommandType.RaiseHand, (attendeeId: string) => {
       callback(attendeeId);
     });
-  }, [callback]);
+  }, []);
 };
 
 export const useOnUnRaiseHand = (callback: Function) => {
@@ -122,7 +122,7 @@ export const useOnUnRaiseHand = (callback: Function) => {
         callback(attendeeId);
       }
     );
-  }, [callback]);
+  }, []);
 };
 
 export const useOnMuteAttendee = (callback: Function) => {
@@ -133,7 +133,7 @@ export const useOnMuteAttendee = (callback: Function) => {
         callback(attendeeId);
       }
     );
-  }, [callback]);
+  }, []);
 };
 
 export const useOnUnMuteAttendee = (callback: Function) => {
@@ -144,5 +144,5 @@ export const useOnUnMuteAttendee = (callback: Function) => {
         callback(attendeeId);
       }
     );
-  }, [callback]);
+  }, []);
 };

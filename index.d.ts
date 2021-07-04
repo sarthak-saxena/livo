@@ -15,11 +15,13 @@ interface Props {
   ) => void;
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
+  onCallDisconnectCallback?: Function;
+  onPurgeComplete?: Function
 }
 
 declare const Livo: ({
   mode,
-  voxeetConfig,
+  apiConfig,
   attendee,
   room,
 }: Props) => JSX.Element;

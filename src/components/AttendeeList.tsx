@@ -51,7 +51,7 @@ export const AttendeeList = ({ ...props }) => {
 
     // Todo Fix hack - add logic for resync
     setTimeout(sync, 1000);
-  }, [conference]);
+  }, []);
 
   return (
     <Box className={clsx("box", classes.container)}>

@@ -7,11 +7,7 @@ interface Props {
 }
 
 const ConferenceContainer = ({ mode }: Props) => {
-  return (
-    <>
-      <Conference />
-    </>
-  );
+  return <Conference />;
 };
 
 export default ConferenceContainer;

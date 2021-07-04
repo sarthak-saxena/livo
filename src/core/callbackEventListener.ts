@@ -16,11 +16,11 @@ export default class CallbackEventListener {
     this.listeners[eventListenerName].push(listener);
   };
 
-  call = (eventListenerName: VoxeetCommandType, params?: any) => {
+  call = (eventListenerName: VoxeetCommandType | string, params?: any) => {
     if (this.listeners[eventListenerName]) {
       this.listeners[eventListenerName].forEach((cb) => cb(params));
       if (this.updateDataStore) {
-        dataStore.update(eventListenerName, params);
+        dataStore.update(eventListenerName as VoxeetCommandType, params);
       }
     }
   };
