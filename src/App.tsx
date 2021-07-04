@@ -100,13 +100,13 @@ export class App extends React.Component<Props, State> {
               </DataSyncContext.Provider>
             </VoxeetContext.Provider>
           ) : (
-            <>{`${
+            <Box>{`${
               !conference
                 ? "Initializing Livo"
                 : !syncedData
                 ? "Synchronising state"
                 : ""
-            }...`}</>
+            }...`}</Box>
           )}
         </UserContext.Provider>
       </ThemeProvider>

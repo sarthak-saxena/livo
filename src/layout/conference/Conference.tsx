@@ -39,30 +39,27 @@ const Conference = ({ ...props }) => {
   useResizeMediaObserver(onResizeMediaCallback);
 
   return (
-    <>
-      {/*<VideoStreamContainer/>*/}
-      <Row className={clsx(classes.container)}>
-        <Column
-          className={clsx(
-            "column",
-            !isSmallScreen && "is-two-thirds",
-            classes.attendeeAndCallpadContainer
-          )}
-        >
-          <ConnectedUsers />
-          <CallPad />
-        </Column>
-        <Column
-          className={
-            isSmallScreen
-              ? classes.attendeeListWrapperSm
-              : classes.attendeeListWrapperLg
-          }
-        >
-          <AttendeeList />
-        </Column>
-      </Row>
-    </>
+    <Row className={clsx(classes.container)}>
+      <Column
+        className={clsx(
+          "column",
+          !isSmallScreen && "is-two-thirds",
+          classes.attendeeAndCallpadContainer
+        )}
+      >
+        <ConnectedUsers />
+        <CallPad />
+      </Column>
+      <Column
+        className={
+          isSmallScreen
+            ? classes.attendeeListWrapperSm
+            : classes.attendeeListWrapperLg
+        }
+      >
+        <AttendeeList />
+      </Column>
+    </Row>
   );
 };
 
