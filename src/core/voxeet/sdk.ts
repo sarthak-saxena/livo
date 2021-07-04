@@ -46,6 +46,7 @@ export const purgeVoxeetSession = async () => {
 };
 
 export const purgeVoxeetConference = async () => {
+  console.log('purging voxeet conference')
   await VoxeetSdk.conference.leave({ leaveRoom: true });
 };
 
