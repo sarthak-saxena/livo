@@ -37,6 +37,7 @@ interface Props {
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
   onCallDisconnectCallback?: Function;
+  onPurgeComplete?: Function
 }
 
 interface State {
@@ -75,7 +76,7 @@ export class App extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    purgeVoxeetConference();
+    purgeVoxeetConference(this.props.onPurgeComplete);
   }
 
   render() {

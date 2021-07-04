@@ -44,11 +44,12 @@ export const purgeVoxeetSession = async () => {
   await VoxeetSdk.session.close();
 };
 
-export const purgeVoxeetConference = async () => {
+export const purgeVoxeetConference = async (onDestroy?: Function) => {
   console.log("purging voxeet conference");
   await VoxeetSdk.conference.leave();
   await purgeVoxeetSession();
   VoxeetSdk.command.off("received", commandListenerCallbacks);
+  onDestroy && onDestroy()
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {
