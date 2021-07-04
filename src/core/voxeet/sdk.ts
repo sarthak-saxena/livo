@@ -16,6 +16,7 @@ export const initializeVoxeet = async (
 ): Promise<Conference | undefined> => {
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
+    await purgeVoxeetSession()
     await VoxeetSdk.session.open({
       name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
       externalId: creator.id,
