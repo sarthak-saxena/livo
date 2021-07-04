@@ -37,6 +37,7 @@ export const initializeVoxeet = async (
 };
 
 const controlMuteState = () => {
+  console.log('voxeet controlMuteState')
   invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
   toggleMuteAttendee(undefined, true);
 };
