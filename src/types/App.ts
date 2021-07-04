@@ -3,3 +3,7 @@ export enum ConferenceMode {
   LiveStream = "LiveStream",
   VideoConference = "VideoConference",
 }
+
+export enum LocalStorageKeys {
+  muteState = 'voxeetSdkMuteState'
+}

@@ -16,7 +16,6 @@ import {
   faMicrophone,
   faMicrophoneSlash,
   faPhone,
-  faSlidersH,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
@@ -35,11 +34,9 @@ import {
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
-import { dataStore } from "../App";
-import {
-  useOnResizeMediaCallback,
-  useResizeMediaObserver,
-} from "../services/hooks/resizeMediaObserverHook";
+import { LocalStorageKeys } from "../types/App";
+import { useOnResizeMediaCallback, useResizeMediaObserver } from "../services/hooks/resizeMediaObserverHook";
+import { useMuteState } from "../services/hooks/muteStateHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -102,7 +99,6 @@ const useOnGrantSpeakerAccessCallback = (
     (attendeeId: string) => {
       if (attendeeId === getVoxeetSessionParticipantId()) {
         // Todo discuss & add if mike needs to be enabled by default once the member becomes speaker
-        // toggleMuteAttendee();
         // muteMike(false);
 
         enableMike(true);
@@ -133,12 +129,14 @@ const useOnRevokeSpeakerAccessCallback = (
 
 const useOnMuteAttendeeCallback = (muteMike) => {
   const participantId = getVoxeetSessionParticipantId();
+  const {setMuteState} = useMuteState()
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === participantId) {
         const mute = true;
         muteMike(mute);
         toggleMuteAttendee(undefined, mute);
+        setMuteState(mute)
       }
     },
     [muteMike, participantId]
@@ -147,12 +145,14 @@ const useOnMuteAttendeeCallback = (muteMike) => {
 
 const useOnUnMuteAttendeeCallback = (muteMike) => {
   const participantId = getVoxeetSessionParticipantId();
+  const {setMuteState} = useMuteState()
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === participantId) {
         const mute = false;
         muteMike(mute);
         toggleMuteAttendee(undefined, mute);
+        setMuteState(mute)
       }
     },
     [muteMike, participantId]
@@ -161,15 +161,18 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
 
 const useDataFromDataSync = (participantId: string) => {
   const { attendee } = useAttendee();
+  const {getMuteState} = useMuteState()
   const dataSync = useDataSync();
   let setHandRaisedDefault = false,
-    muteMikeDefault = true,
+    muteMikeDefault = getMuteState(),
     enableMikeDefault = attendee.isConferenceCreator,
     requestSpeakerAccessButtonEnabledDefault = true;
+    debugger
   if (dataSync[participantId]) {
     const state = dataSync[participantId];
     setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
-    muteMikeDefault = state.mute || muteMikeDefault;
+    muteMikeDefault = muteMikeDefault === undefined ? state.mute : muteMikeDefault;
+    debugger
     enableMikeDefault = state.speaker || enableMikeDefault;
     requestSpeakerAccessButtonEnabledDefault =
       state.speaker === undefined
@@ -221,9 +224,11 @@ const CallPad = ({ ...props }) => {
     enableRequestSpeakerAccessButton,
   ] = useState(requestSpeakerAccessButtonEnabledDefault);
   const [isSmallScreen, setSmallScreen] = useState(false);
+  const {setMuteState} = useMuteState()
 
   const muteMikeCallback = useCallback(() => {
     const mute = !isMikeMute;
+    setMuteState(mute)
     if (mute) {
       invokeMuteAttendeeCommand(participantId);
       voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, participantId);
