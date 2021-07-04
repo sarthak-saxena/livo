@@ -196,10 +196,10 @@ const CallPad = ({ ...props }) => {
 
     if (value) {
       raiseHandInConference(participantId);
-      dataStore.update(VoxeetCommandType.RaiseHand, participantId);
+      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, participantId);
     } else {
       unRaiseHandInConference(participantId);
-      dataStore.update(VoxeetCommandType.unRaiseHand, participantId);
+      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, participantId);
     }
 
     setHandRaised(value);

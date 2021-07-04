@@ -46,5 +46,5 @@ export const useResizeMediaObserver = (callback: Function) => {
   useEffect(() => {
     initResizeObserver();
     callbackEventListener.on(ResizeMediaCallback, callback);
-  }, [callback]);
+  }, []);
 };

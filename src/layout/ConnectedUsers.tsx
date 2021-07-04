@@ -24,6 +24,8 @@ import {
   useOnResizeMediaCallback,
   useResizeMediaObserver,
 } from "../services/hooks/resizeMediaObserverHook";
+import { getVoxeetSessionParticipants } from "../core/voxeet/sdk";
+import VoxeetSdk from "@voxeet/voxeet-web-sdk";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -56,20 +58,9 @@ export const useAttendeeAddCallback = (
       stream: MediaStream,
       eventType: VoxeetConferenceEvents
     ) => {
-      const attendeesLength = attendees.length;
-      const index = attendees.findIndex((a) => a.id === participant.id);
-      if (eventType === VoxeetConferenceEvents.StreamAdded) {
-        if (index === -1) {
-          attendees.push(participant);
-        }
-      } else if (eventType === VoxeetConferenceEvents.StreamRemoved) {
-        if (index !== -1) {
-          attendees.splice(index, 1);
-        }
-      }
-      if (attendeesLength !== attendees.length) {
-        setAttendees(Object.assign([], attendees));
-      }
+      setTimeout(() => {
+        setAttendees(Object.assign([], getVoxeetSessionParticipants()));
+      })
     },
     [attendees, setAttendees]
   );

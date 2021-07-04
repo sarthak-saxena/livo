@@ -47,7 +47,7 @@ export const purgeVoxeetSession = async () => {
 
 export const purgeVoxeetConference = async (onDestroy?: Function) => {
   console.log("purging voxeet conference");
-  await VoxeetSdk.conference.leave();
+  await VoxeetSdk.conference.leave({leaveRoom: true});
   await purgeVoxeetSession();
   VoxeetSdk.command.off("received", commandListenerCallbacks);
   onDestroy && onDestroy();
@@ -232,3 +232,9 @@ export const addEventlistenersForCommanding = () => {
 export const getVoxeetSessionParticipantId = () => {
   return VoxeetSdk.session.participant.id;
 };
+
+export const getVoxeetSessionParticipants = (): Participant[] => {
+  return (Array.from(
+    VoxeetSdk.conference.participants.values()
+  ) as Participant[]).filter(participant => participant.status !== 'Left')
+}
