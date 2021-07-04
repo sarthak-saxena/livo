@@ -11,7 +11,6 @@ export interface Data {
 export default class DataStore {
     private data;
     dataSyncCallback: CallbackEventListener;
-    constructor();
     update(command: VoxeetCommandType, attendeeId: string): void;
     private setData;
     getData: () => Data;

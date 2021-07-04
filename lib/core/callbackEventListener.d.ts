@@ -6,5 +6,5 @@ export default class CallbackEventListener {
     private readonly updateDataStore;
     constructor(updateDataStore?: boolean);
     on: (eventListenerName: string, listener: Function) => void;
-    call: (eventListenerName: VoxeetCommandType, params?: any) => void;
+    call: (eventListenerName: VoxeetCommandType | string, params?: any) => void;
 }
