@@ -15,10 +15,10 @@ const initResizeObserver = () => {
       if (entries[0] && entries[0].contentBoxSize[0]) {
         const height = entries[0].contentBoxSize[0].blockSize;
         const width = entries[0].contentBoxSize[0].inlineSize;
-        if (width < 500 && height < 300 && !lastInlineSizeSmall) {
+        if (width < 500 && height < 500 && !lastInlineSizeSmall) {
           callbackEventListener.call(ResizeMediaCallback, width);
           lastInlineSizeSmall = true;
-        } else if (width > 500 && height > 300 && lastInlineSizeSmall) {
+        } else if (width > 500 && height > 500 && lastInlineSizeSmall) {
           callbackEventListener.call(ResizeMediaCallback, width);
           lastInlineSizeSmall = false;
         }
