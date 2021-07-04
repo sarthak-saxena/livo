@@ -26,7 +26,7 @@ export const initializeVoxeet = async (
     console.log("conference joined with participants", conference.participants);
 
     // add event listeners for commanding
-    addEventlistenersForCommanding(creator.isConferenceCreator);
+    addEventlistenersForCommanding();
 
     // Important: disable mute initially for every attendee
     controlMuteState();
@@ -37,7 +37,7 @@ export const initializeVoxeet = async (
 };
 
 const controlMuteState = () => {
-  console.log('voxeet controlMuteState')
+  console.log("voxeet controlMuteState");
   invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
   toggleMuteAttendee(undefined, true);
 };
@@ -47,8 +47,10 @@ export const purgeVoxeetSession = async () => {
 };
 
 export const purgeVoxeetConference = async () => {
-  console.log('purging voxeet conference')
-  await VoxeetSdk.conference.leave({ leaveRoom: true });
+  console.log("purging voxeet conference");
+  await VoxeetSdk.conference.leave();
+  await purgeVoxeetSession();
+  VoxeetSdk.command.off("received", commandListenerCallbacks);
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {
@@ -169,69 +171,66 @@ export const responseDataSync = (
   );
 };
 
-export const addEventlistenersForCommanding = (
-  isConferenceCreator?: boolean
-) => {
+const commandListenerCallbacks = (participantWhoEmittedEvent, data) => {
   const participant = VoxeetSdk.session.participant;
-  VoxeetSdk.command.on("received", (participantWhoEmittedEvent, data) => {
-    data = data.split(CommandingEventSeparator);
-    const message = data[0];
-    const attendeeId = data[1];
-    const payload = data[2];
-    switch (message) {
-      case VoxeetCommandType.RequestSpeakerAccess:
+  data = data.split(CommandingEventSeparator);
+  const message = data[0];
+  const attendeeId = data[1];
+  const payload = data[2];
+  switch (message) {
+    case VoxeetCommandType.RequestSpeakerAccess:
+      voxeetHookCallback.call(
+        VoxeetCommandType.RequestSpeakerAccess,
+        participantWhoEmittedEvent
+      );
+      break;
+    case VoxeetCommandType.GrantSpeakerAccess:
+      voxeetHookCallback.call(VoxeetCommandType.GrantSpeakerAccess, attendeeId);
+      break;
+    case VoxeetCommandType.RevokeSpeakerAccess:
+      voxeetHookCallback.call(
+        VoxeetCommandType.RevokeSpeakerAccess,
+        attendeeId
+      );
+      break;
+    case VoxeetCommandType.DenySpeakerAccess:
+      if (attendeeId === participant.id) {
         voxeetHookCallback.call(
-          VoxeetCommandType.RequestSpeakerAccess,
-          participantWhoEmittedEvent
+          VoxeetCommandType.DenySpeakerAccess,
+          participant
         );
-        break;
-      case VoxeetCommandType.GrantSpeakerAccess:
-        voxeetHookCallback.call(
-          VoxeetCommandType.GrantSpeakerAccess,
-          attendeeId
+      }
+      break;
+    case VoxeetCommandType.RaiseHand:
+      voxeetHookCallback.call(VoxeetCommandType.RaiseHand, attendeeId);
+      break;
+    case VoxeetCommandType.unRaiseHand:
+      voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, attendeeId);
+      break;
+    case VoxeetCommandType.MuteAttendee:
+      voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, attendeeId);
+      break;
+    case VoxeetCommandType.UnMuteAttendee:
+      voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, attendeeId);
+      break;
+    case VoxeetCommandType.RequestDataSync:
+      responseDataSync(attendeeId, JSON.stringify(dataStore.getData()));
+      break;
+    case VoxeetCommandType.ResponseDataSync:
+      if (attendeeId === participant.id && payload) {
+        dataStore.dataSyncCallback.call(
+          VoxeetCommandType.ResponseDataSync,
+          JSON.parse(payload)
         );
-        break;
-      case VoxeetCommandType.RevokeSpeakerAccess:
-        voxeetHookCallback.call(
-          VoxeetCommandType.RevokeSpeakerAccess,
-          attendeeId
-        );
-        break;
-      case VoxeetCommandType.DenySpeakerAccess:
-        if (attendeeId === participant.id) {
-          voxeetHookCallback.call(
-            VoxeetCommandType.DenySpeakerAccess,
-            participant
-          );
-        }
-        break;
-      case VoxeetCommandType.RaiseHand:
-        voxeetHookCallback.call(VoxeetCommandType.RaiseHand, attendeeId);
-        break;
-      case VoxeetCommandType.unRaiseHand:
-        voxeetHookCallback.call(VoxeetCommandType.unRaiseHand, attendeeId);
-        break;
-      case VoxeetCommandType.MuteAttendee:
-        voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, attendeeId);
-        break;
-      case VoxeetCommandType.UnMuteAttendee:
-        voxeetHookCallback.call(VoxeetCommandType.UnMuteAttendee, attendeeId);
-        break;
-      case VoxeetCommandType.RequestDataSync:
-        responseDataSync(attendeeId, JSON.stringify(dataStore.getData()));
-        break;
-      case VoxeetCommandType.ResponseDataSync:
-        if (attendeeId === participant.id && payload) {
-          dataStore.dataSyncCallback.call(
-            VoxeetCommandType.ResponseDataSync,
-            JSON.parse(payload)
-          );
-        }
-        break;
-      default:
-        console.error("Unknown command type");
-    }
-  });
+      }
+      break;
+    default:
+      console.error("Unknown command type");
+  }
+};
+
+export const addEventlistenersForCommanding = () => {
+  VoxeetSdk.command.on("received", commandListenerCallbacks);
 };
 
 export const getVoxeetSessionParticipantId = () => {
