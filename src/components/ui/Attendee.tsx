@@ -27,6 +27,7 @@ import {
 import { VoxeetCommandType } from "../../types/Voxeet";
 import { getShortHandName } from "../../core/Utilities";
 import { useDataSync } from "../../services/hooks/dataSyncHook";
+import { useMuteState } from "../../services/hooks/muteStateHook";
 
 interface Props {
   attendee: Participant;
@@ -83,8 +84,9 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
 };
 
 const useDataFromDataSync = (attendee: Participant) => {
+  const {getMuteState} = useMuteState()
   let enableMakeSpeakerButtonDefault = true,
-    muteMikeDefault = true;
+    muteMikeDefault = getMuteState();
 
   const dataSync = useDataSync();
   const attendeeDataSync = dataSync[attendee.id];

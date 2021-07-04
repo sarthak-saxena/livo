@@ -6,6 +6,7 @@ import Conference from "@voxeet/voxeet-web-sdk/types/models/Conference";
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { voxeetHookCallback } from "../../services/hooks/voxeetHook";
 import { dataStore } from "../../App";
+import { LocalStorageKeys } from "../../types/App";
 
 const CommandingEventSeparator = "^_^";
 
@@ -27,7 +28,7 @@ export const initializeVoxeet = async (
     addEventlistenersForCommanding();
 
     // Important: disable mute initially for every attendee
-    controlMuteState();
+    controlMuteState(creator);
     return conference;
   } catch (e) {
     console.error("Error in joining conference: " + e);
@@ -35,10 +36,15 @@ export const initializeVoxeet = async (
   }
 };
 
-const controlMuteState = () => {
-  console.log("voxeet controlMuteState");
-  invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
-  toggleMuteAttendee(undefined, true);
+const controlMuteState = (attendee: Attendee) => {
+  const muteState = localStorage.getItem(`${LocalStorageKeys.muteState}-${attendee.id}`)
+  const mute = muteState === "true" ? true : muteState === "false" ? false : true
+  if(muteState) {
+    invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
+  } else {
+    invokeUnMuteAttendeeCommand(getVoxeetSessionParticipantId())
+  }
+  toggleMuteAttendee(undefined, mute);
 };
 
 export const purgeVoxeetSession = async () => {
@@ -94,7 +100,7 @@ export const toggleMuteAttendee = (
 ) => {
   VoxeetSdk.conference.mute(
     participant || VoxeetSdk.session.participant,
-    muted || !VoxeetSdk.conference.isMuted()
+    muted
   );
 };
 
