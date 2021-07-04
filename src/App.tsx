@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ConferenceMode } from "./types/App";
 import {
   VoxeetAttendee,
@@ -39,28 +39,31 @@ interface Props {
   onCallDisconnectCallback?: Function;
 }
 
-export const App = ({
-  mode,
-  apiConfig,
-  attendee,
-  room,
-  onAttendeeAdd,
-  onAppInitializedSuccessCallback,
-  onAppInitializedErrorCallback,
-  onCallDisconnectCallback,
-}: Props) => {
-  const [conference, setConference] = useState(
-    undefined as Conference | undefined
-  );
-  const [syncedData, setSyncedData] = useState(undefined as Data | undefined);
+interface State {
+  conference: Conference | undefined;
+  syncedData: Data | undefined;
+}
 
-  useEffect(() => {
+export class App extends React.Component<Props, State> {
+  state = {
+    conference: undefined,
+    syncedData: undefined,
+  };
+
+  componentWillMount() {
+    const {
+      apiConfig,
+      attendee,
+      room,
+      onAppInitializedSuccessCallback,
+      onAppInitializedErrorCallback,
+    } = this.props;
     initializeVoxeet(apiConfig, attendee, room)
       .then((conference) => {
         if (conference) {
-          setConference(conference);
-          dataStore.synchronise(conference).then((data) => {
-            setSyncedData(data);
+          this.setState({ conference });
+          dataStore.synchronise(conference).then((syncedData) => {
+            this.setState({ syncedData });
           });
           onAppInitializedSuccessCallback &&
             onAppInitializedSuccessCallback(conference);
@@ -69,40 +72,44 @@ export const App = ({
       .catch((error) => {
         onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
       });
-    return function cleanup() {
-      // purgeVoxeetConference();
-    };
-  }, [
-    apiConfig,
-    attendee,
-    room,
-    onAppInitializedSuccessCallback,
-    onAppInitializedErrorCallback,
-  ]);
+  }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <UserContext.Provider
-        value={{ attendee, onAttendeeAdd, onCallDisconnectCallback }}
-      >
-        {conference && syncedData ? (
-          <VoxeetContext.Provider value={{ conference }}>
-            <DataSyncContext.Provider value={syncedData}>
-              <Box className={LivoAppContainer}>
-                <ConferenceContainer mode={mode} />
-              </Box>
-            </DataSyncContext.Provider>
-          </VoxeetContext.Provider>
-        ) : (
-          <>{`${
-            !conference
-              ? "Initializing Livo"
-              : !syncedData
-              ? "Synchronising state"
-              : ""
-          }...`}</>
-        )}
-      </UserContext.Provider>
-    </ThemeProvider>
-  );
-};
+  componentWillUnmount() {
+    purgeVoxeetConference();
+  }
+
+  render() {
+    const {
+      attendee,
+      onAttendeeAdd,
+      onCallDisconnectCallback,
+      mode,
+    } = this.props;
+    const { conference, syncedData } = this.state;
+    return (
+      <ThemeProvider theme={theme}>
+        <UserContext.Provider
+          value={{ attendee, onAttendeeAdd, onCallDisconnectCallback }}
+        >
+          {conference && syncedData ? (
+            <VoxeetContext.Provider value={{ conference }}>
+              <DataSyncContext.Provider value={syncedData}>
+                <Box className={LivoAppContainer}>
+                  <ConferenceContainer mode={mode} />
+                </Box>
+              </DataSyncContext.Provider>
+            </VoxeetContext.Provider>
+          ) : (
+            <>{`${
+              !conference
+                ? "Initializing Livo"
+                : !syncedData
+                ? "Synchronising state"
+                : ""
+            }...`}</>
+          )}
+        </UserContext.Provider>
+      </ThemeProvider>
+    );
+  }
+}
