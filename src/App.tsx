@@ -36,6 +36,7 @@ interface Props {
   ) => void;
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
+  onCallDisconnectCallback?: Function;
 }
 
 export const App = ({
@@ -46,6 +47,7 @@ export const App = ({
   onAttendeeAdd,
   onAppInitializedSuccessCallback,
   onAppInitializedErrorCallback,
+  onCallDisconnectCallback,
 }: Props) => {
   const [conference, setConference] = useState(
     undefined as Conference | undefined
@@ -68,7 +70,7 @@ export const App = ({
         onAppInitializedErrorCallback && onAppInitializedErrorCallback(error);
       });
     return function cleanup() {
-      purgeVoxeetConference();
+      // purgeVoxeetConference();
     };
   }, [
     apiConfig,
@@ -80,7 +82,9 @@ export const App = ({
 
   return (
     <ThemeProvider theme={theme}>
-      <UserContext.Provider value={{ attendee, onAttendeeAdd }}>
+      <UserContext.Provider
+        value={{ attendee, onAttendeeAdd, onCallDisconnectCallback }}
+      >
         {conference && syncedData ? (
           <VoxeetContext.Provider value={{ conference }}>
             <DataSyncContext.Provider value={syncedData}>

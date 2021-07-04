@@ -205,7 +205,7 @@ const CallPad = ({ ...props }) => {
     setHandRaised(value);
   };
 
-  const { attendee } = useAttendee();
+  const { attendee, onCallDisconnectCallback } = useAttendee();
   const {
     setHandRaisedDefault,
     muteMikeDefault,
@@ -262,7 +262,13 @@ const CallPad = ({ ...props }) => {
   return (
     <Row className={classes.root}>
       <Column className={clsx("is-two-thirds", classes.configWrapper)}>
-        <Box onClick={purgeVoxeetConference} className={classes.iconWrapper}>
+        <Box
+          onClick={() => {
+            onCallDisconnectCallback && onCallDisconnectCallback();
+            purgeVoxeetConference();
+          }}
+          className={classes.iconWrapper}
+        >
           <FontAwesomeIcon size={"lg"} icon={faPhone} />
         </Box>
         <Box>

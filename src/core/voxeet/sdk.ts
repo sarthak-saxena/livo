@@ -37,7 +37,7 @@ export const initializeVoxeet = async (
 };
 
 const controlMuteState = () => {
-  console.log('voxeet controlMuteState')
+  console.log("voxeet controlMuteState");
   invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
   toggleMuteAttendee(undefined, true);
 };
@@ -47,7 +47,7 @@ export const purgeVoxeetSession = async () => {
 };
 
 export const purgeVoxeetConference = async () => {
-  console.log('purging voxeet conference')
+  console.log("purging voxeet conference");
   await VoxeetSdk.conference.leave({ leaveRoom: true });
 };
 
