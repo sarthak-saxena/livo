@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   getVoxeetSessionParticipantId,
   invokeMuteAttendeeCommand,
@@ -36,6 +36,10 @@ import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
 import { dataStore } from "../App";
+import {
+  useOnResizeMediaCallback,
+  useResizeMediaObserver,
+} from "../services/hooks/resizeMediaObserverHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -67,12 +71,12 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  requestButton: {
+  requestButtonLg: {
     display: "flex",
     flexDirection: "row-reverse",
-    "@media (max-width: 500px)": {
-      display: "none",
-    },
+  },
+  requestButtonSm: {
+    display: "none",
   },
   button: {
     width: "3.5rem",
@@ -216,6 +220,7 @@ const CallPad = ({ ...props }) => {
     requestSpeakerAccessButtonEnabled,
     enableRequestSpeakerAccessButton,
   ] = useState(requestSpeakerAccessButtonEnabledDefault);
+  const [isSmallScreen, setSmallScreen] = useState(false);
 
   const muteMikeCallback = useCallback(() => {
     const mute = !isMikeMute;
@@ -244,6 +249,7 @@ const CallPad = ({ ...props }) => {
   );
   const onMuteAttendeeCallback = useOnMuteAttendeeCallback(muteMike);
   const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(muteMike);
+  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
   useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
   useOnGrantSpeakerAccess(onGrantSpeakerAccess);
@@ -251,15 +257,12 @@ const CallPad = ({ ...props }) => {
   useOnMuteAttendee(onMuteAttendeeCallback);
   useOnUnMuteAttendee(onUnMuteAttendeeCallback);
 
+  useResizeMediaObserver(onResizeMediaCallback);
+
   return (
     <Row className={classes.root}>
       <Column className={clsx("is-two-thirds", classes.configWrapper)}>
-        <Box
-          onClick={() => {
-            purgeVoxeetConference();
-          }}
-          className={classes.iconWrapper}
-        >
+        <Box onClick={purgeVoxeetConference} className={classes.iconWrapper}>
           <FontAwesomeIcon size={"lg"} icon={faPhone} />
         </Box>
         <Box>
@@ -297,7 +300,11 @@ const CallPad = ({ ...props }) => {
         </Box>
       </Column>
       {!attendee.isConferenceCreator && (
-        <Column className={classes.requestButton}>
+        <Column
+          className={
+            isSmallScreen ? classes.requestButtonSm : classes.requestButtonLg
+          }
+        >
           <Box>
             <Button
               disabled={!requestSpeakerAccessButtonEnabled}

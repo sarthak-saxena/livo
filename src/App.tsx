@@ -23,6 +23,8 @@ const theme = {
   background: "white",
 };
 
+export const LivoAppContainer = "livo-app-container";
+
 interface Props {
   mode: ConferenceMode;
   apiConfig: SdkAPIConfig;
@@ -82,7 +84,7 @@ export const App = ({
         {conference && syncedData ? (
           <VoxeetContext.Provider value={{ conference }}>
             <DataSyncContext.Provider value={syncedData}>
-              <Box className={"app-container"}>
+              <Box className={LivoAppContainer}>
                 <ConferenceContainer mode={mode} />
               </Box>
             </DataSyncContext.Provider>

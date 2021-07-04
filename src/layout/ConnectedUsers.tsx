@@ -20,29 +20,29 @@ import Column from "../components/ui/Column";
 import Row from "../components/ui/Row";
 import { isCreator } from "../core/Utilities";
 import { useDataSync } from "../services/hooks/dataSyncHook";
+import {
+  useOnResizeMediaCallback,
+  useResizeMediaObserver,
+} from "../services/hooks/resizeMediaObserverHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
     padding: 20,
   },
-  attendeesWrapper: {
-    "@media (min-width: 500px)": {
-      display: "block",
-    },
-    "@media (max-width: 500px)": {
-      display: "none",
-    },
+  attendeesWrapperLg: {
+    display: "block",
   },
-  callInProgressWrapper: {
-    "@media (max-width: 500px)": {
-      height: "100px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    "@media (min-width: 501px)": {
-      display: "none",
-    },
+  attendeesWrapperSm: {
+    display: "none",
+  },
+  callInProgressWrapperSm: {
+    height: "100px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  callInProgressWrapperLg: {
+    display: "none",
   },
 }));
 
@@ -161,6 +161,7 @@ const ConnectedUsers = ({ ...props }) => {
     syncedMicStatus,
     syncedHandsRaised,
   } = useSyncFromDataSync();
+  const [isSmallScreen, setSmallScreen] = useState(false);
   const [speakers, setSpeakers] = useState(
     syncedSpeakers as { [id: string]: boolean }
   );
@@ -194,7 +195,9 @@ const ConnectedUsers = ({ ...props }) => {
     micStatus,
     setMikeStatus
   );
+  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
+  useResizeMediaObserver(onResizeMediaCallback);
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onGrantSpeakerAccessCallback);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccessCallback);
@@ -214,12 +217,17 @@ const ConnectedUsers = ({ ...props }) => {
     // Todo Fix hack - add logic for resync
     setTimeout(sync, 1000);
   }, [conference]);
-
   return (
     <Box>
       <Column>{/*<UserAvatar  />*/}</Column>
       <Typography>Members Connected: {attendees.length}</Typography>
-      <Box className={classes.attendeesWrapper}>
+      <Box
+        className={
+          isSmallScreen
+            ? classes.attendeesWrapperSm
+            : classes.attendeesWrapperLg
+        }
+      >
         <Row>
           <Column>
             <Typography className={"is-size-4"}>Speakers:</Typography>
@@ -261,7 +269,15 @@ const ConnectedUsers = ({ ...props }) => {
           </Row>
         </Row>
       </Box>
-      <Box className={classes.callInProgressWrapper}>Call in progress</Box>
+      <Box
+        className={
+          isSmallScreen
+            ? classes.callInProgressWrapperSm
+            : classes.callInProgressWrapperLg
+        }
+      >
+        Call {attendees.length > 0 ? "in progress" : "disconnected"}
+      </Box>
     </Box>
   );
 };
