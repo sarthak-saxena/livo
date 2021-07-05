@@ -37,12 +37,15 @@ export const initializeVoxeet = async (
 };
 
 const controlMuteState = (conference: Conference) => {
-  const muteState = localStorage.getItem(`${LocalStorageKeys.muteState}-${conference.id}`)
-  const mute = muteState === "true" ? true : muteState === "false" ? false : true
-  if(mute) {
+  const muteState = localStorage.getItem(
+    `${LocalStorageKeys.muteState}-${conference.id}`
+  );
+  const mute =
+    muteState === "true" ? true : muteState === "false" ? false : true;
+  if (mute) {
     invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
   } else {
-    invokeUnMuteAttendeeCommand(getVoxeetSessionParticipantId())
+    invokeUnMuteAttendeeCommand(getVoxeetSessionParticipantId());
   }
   toggleMuteAttendee(undefined, mute);
 };
@@ -53,10 +56,10 @@ export const purgeVoxeetSession = async () => {
 
 export const purgeVoxeetConference = async (onDestroy?: Function) => {
   console.log("purging voxeet conference");
-  await VoxeetSdk.conference.leave({leaveRoom: true});
+  await VoxeetSdk.conference.leave({ leaveRoom: true });
   await purgeVoxeetSession();
   VoxeetSdk.command.off("received", commandListenerCallbacks);
-  onDestroy && onDestroy();  
+  onDestroy && onDestroy();
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {
@@ -242,5 +245,5 @@ export const getVoxeetSessionParticipantId = () => {
 export const getVoxeetSessionParticipants = (): Participant[] => {
   return (Array.from(
     VoxeetSdk.conference.participants.values()
-  ) as Participant[]).filter(participant => participant.status !== 'Left')
-}
+  ) as Participant[]).filter((participant) => participant.status !== "Left");
+};
