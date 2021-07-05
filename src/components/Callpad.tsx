@@ -34,7 +34,6 @@ import {
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
-import { LocalStorageKeys } from "../types/App";
 import { useOnResizeMediaCallback, useResizeMediaObserver } from "../services/hooks/resizeMediaObserverHook";
 import { useMuteState } from "../services/hooks/muteStateHook";
 
@@ -167,18 +166,17 @@ const useDataFromDataSync = (participantId: string) => {
     muteMikeDefault = getMuteState(),
     enableMikeDefault = attendee.isConferenceCreator,
     requestSpeakerAccessButtonEnabledDefault = true;
-    debugger
   if (dataSync[participantId]) {
     const state = dataSync[participantId];
     setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
     muteMikeDefault = muteMikeDefault === undefined ? state.mute : muteMikeDefault;
-    debugger
     enableMikeDefault = state.speaker || enableMikeDefault;
     requestSpeakerAccessButtonEnabledDefault =
       state.speaker === undefined
         ? requestSpeakerAccessButtonEnabledDefault
         : !state.speaker;
   }
+
   return {
     setHandRaisedDefault,
     muteMikeDefault,

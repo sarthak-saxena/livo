@@ -28,7 +28,7 @@ export const initializeVoxeet = async (
     addEventlistenersForCommanding();
 
     // Important: disable mute initially for every attendee
-    controlMuteState(creator);
+    controlMuteState(conference);
     return conference;
   } catch (e) {
     console.error("Error in joining conference: " + e);
@@ -36,10 +36,10 @@ export const initializeVoxeet = async (
   }
 };
 
-const controlMuteState = (attendee: Attendee) => {
-  const muteState = localStorage.getItem(`${LocalStorageKeys.muteState}-${attendee.id}`)
+const controlMuteState = (conference: Conference) => {
+  const muteState = localStorage.getItem(`${LocalStorageKeys.muteState}-${conference.id}`)
   const mute = muteState === "true" ? true : muteState === "false" ? false : true
-  if(muteState) {
+  if(mute) {
     invokeMuteAttendeeCommand(getVoxeetSessionParticipantId());
   } else {
     invokeUnMuteAttendeeCommand(getVoxeetSessionParticipantId())
@@ -56,7 +56,7 @@ export const purgeVoxeetConference = async (onDestroy?: Function) => {
   await VoxeetSdk.conference.leave({leaveRoom: true});
   await purgeVoxeetSession();
   VoxeetSdk.command.off("received", commandListenerCallbacks);
-  onDestroy && onDestroy();
+  onDestroy && onDestroy();  
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {
