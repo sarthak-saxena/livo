@@ -84,7 +84,7 @@ const useOnUnMuteAttendeeCallback = (muteMike, participantId: string) => {
 };
 
 const useDataFromDataSync = (attendee: Participant) => {
-  const {getMuteState} = useMuteState()
+  const { getMuteState } = useMuteState();
   let enableMakeSpeakerButtonDefault = true,
     muteMikeDefault = getMuteState();
 

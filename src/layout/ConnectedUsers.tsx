@@ -60,7 +60,7 @@ export const useAttendeeAddCallback = (
     ) => {
       setTimeout(() => {
         setAttendees(Object.assign([], getVoxeetSessionParticipants()));
-      })
+      });
     },
     [attendees, setAttendees]
   );

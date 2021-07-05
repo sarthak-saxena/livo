@@ -5,5 +5,5 @@ export enum ConferenceMode {
 }
 
 export enum LocalStorageKeys {
-  muteState = 'voxeetSdkMuteState'
+  muteState = "voxeetSdkMuteState",
 }

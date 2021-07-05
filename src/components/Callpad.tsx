@@ -34,8 +34,10 @@ import {
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
-import { LocalStorageKeys } from "../types/App";
-import { useOnResizeMediaCallback, useResizeMediaObserver } from "../services/hooks/resizeMediaObserverHook";
+import {
+  useOnResizeMediaCallback,
+  useResizeMediaObserver,
+} from "../services/hooks/resizeMediaObserverHook";
 import { useMuteState } from "../services/hooks/muteStateHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
@@ -129,14 +131,14 @@ const useOnRevokeSpeakerAccessCallback = (
 
 const useOnMuteAttendeeCallback = (muteMike) => {
   const participantId = getVoxeetSessionParticipantId();
-  const {setMuteState} = useMuteState()
+  const { setMuteState } = useMuteState();
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === participantId) {
         const mute = true;
         muteMike(mute);
         toggleMuteAttendee(undefined, mute);
-        setMuteState(mute)
+        setMuteState(mute);
       }
     },
     [muteMike, participantId]
@@ -145,14 +147,14 @@ const useOnMuteAttendeeCallback = (muteMike) => {
 
 const useOnUnMuteAttendeeCallback = (muteMike) => {
   const participantId = getVoxeetSessionParticipantId();
-  const {setMuteState} = useMuteState()
+  const { setMuteState } = useMuteState();
   return React.useCallback(
     (attendeeId: string) => {
       if (attendeeId === participantId) {
         const mute = false;
         muteMike(mute);
         toggleMuteAttendee(undefined, mute);
-        setMuteState(mute)
+        setMuteState(mute);
       }
     },
     [muteMike, participantId]
@@ -161,24 +163,24 @@ const useOnUnMuteAttendeeCallback = (muteMike) => {
 
 const useDataFromDataSync = (participantId: string) => {
   const { attendee } = useAttendee();
-  const {getMuteState} = useMuteState()
+  const { getMuteState } = useMuteState();
   const dataSync = useDataSync();
   let setHandRaisedDefault = false,
     muteMikeDefault = getMuteState(),
     enableMikeDefault = attendee.isConferenceCreator,
     requestSpeakerAccessButtonEnabledDefault = true;
-    debugger
   if (dataSync[participantId]) {
     const state = dataSync[participantId];
     setHandRaisedDefault = state.handRaised || setHandRaisedDefault;
-    muteMikeDefault = muteMikeDefault === undefined ? state.mute : muteMikeDefault;
-    debugger
+    muteMikeDefault =
+      muteMikeDefault === undefined ? state.mute : muteMikeDefault;
     enableMikeDefault = state.speaker || enableMikeDefault;
     requestSpeakerAccessButtonEnabledDefault =
       state.speaker === undefined
         ? requestSpeakerAccessButtonEnabledDefault
         : !state.speaker;
   }
+
   return {
     setHandRaisedDefault,
     muteMikeDefault,
@@ -224,11 +226,11 @@ const CallPad = ({ ...props }) => {
     enableRequestSpeakerAccessButton,
   ] = useState(requestSpeakerAccessButtonEnabledDefault);
   const [isSmallScreen, setSmallScreen] = useState(false);
-  const {setMuteState} = useMuteState()
+  const { setMuteState } = useMuteState();
 
   const muteMikeCallback = useCallback(() => {
     const mute = !isMikeMute;
-    setMuteState(mute)
+    setMuteState(mute);
     if (mute) {
       invokeMuteAttendeeCommand(participantId);
       voxeetHookCallback.call(VoxeetCommandType.MuteAttendee, participantId);
