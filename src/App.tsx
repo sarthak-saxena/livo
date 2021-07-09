@@ -5,7 +5,11 @@ import {
   VoxeetAttendee,
   VoxeetConferenceEvents,
 } from "./types/Voxeet";
-import { initializeVoxeet, purgeVoxeetConference } from "./core/voxeet/sdk";
+import {
+  getVoxeetSessionParticipants,
+  initializeVoxeet,
+  purgeVoxeetConference,
+} from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
 import ConferenceContainer from "./layout/conference/ConferenceContainer";
 import { VoxeetContext } from "./services/context/voxeetContext";
@@ -58,6 +62,8 @@ export class App extends React.Component<Props, State> {
 
   private retryCount = 0;
 
+  private synchronizeData = () => {};
+
   private initConference() {
     const {
       apiConfig,
@@ -69,15 +75,21 @@ export class App extends React.Component<Props, State> {
     initializeVoxeet(apiConfig, attendee, room)
       .then((conference) => {
         if (conference) {
-          this.setState({ conference });
-          dataStore
-            .synchronise(conference)
-            .then((syncedData) => {
-              this.setState({ syncedData });
-            })
-            .catch((error) => {
-              alert(error);
-            });
+          this.setState({ conference }, () => {
+            let participants = getVoxeetSessionParticipants();
+            if (participants.length <= 1) {
+              this.setState({ syncedData: {} });
+            } else {
+              dataStore
+                .synchronise(conference)
+                .then((syncedData) => {
+                  this.setState({ syncedData });
+                })
+                .catch((error) => {
+                  alert(error);
+                });
+            }
+          });
           onAppInitializedSuccessCallback &&
             onAppInitializedSuccessCallback(conference);
         }
