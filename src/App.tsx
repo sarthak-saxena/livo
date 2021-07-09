@@ -1,9 +1,9 @@
 import React from "react";
 import { ConferenceMode } from "./types/App";
 import {
+  SdkAPIConfig,
   VoxeetAttendee,
   VoxeetConferenceEvents,
-  SdkAPIConfig,
 } from "./types/Voxeet";
 import { initializeVoxeet, purgeVoxeetConference } from "./core/voxeet/sdk";
 import { Attendee, Room } from "./types/Conference";
@@ -16,6 +16,7 @@ import "./styles/index.sass";
 import Box from "./components/ui/Box";
 import DataStore, { Data } from "./core/dataStore";
 import { DataSyncContext } from "./services/context/dataSyncContext";
+
 export const dataStore = new DataStore();
 
 const theme = {
@@ -26,7 +27,6 @@ const theme = {
 export const LivoAppContainer = "livo-app-container";
 
 interface Props {
-  mode: ConferenceMode;
   apiConfig: SdkAPIConfig;
   attendee: Attendee;
   room: Room;
@@ -38,6 +38,8 @@ interface Props {
   onAppInitializedErrorCallback?: (e: Error) => void;
   onCallDisconnectCallback?: Function;
   onPurgeComplete?: Function;
+  mode?: ConferenceMode;
+  disablePurgeOnRemount?: boolean;
 }
 
 interface State {
@@ -68,9 +70,14 @@ export class App extends React.Component<Props, State> {
       .then((conference) => {
         if (conference) {
           this.setState({ conference });
-          dataStore.synchronise(conference).then((syncedData) => {
-            this.setState({ syncedData });
-          });
+          dataStore
+            .synchronise(conference)
+            .then((syncedData) => {
+              this.setState({ syncedData });
+            })
+            .catch((error) => {
+              alert(error);
+            });
           onAppInitializedSuccessCallback &&
             onAppInitializedSuccessCallback(conference);
         }
@@ -88,12 +95,19 @@ export class App extends React.Component<Props, State> {
       });
   }
 
+  public async invokePurgeSession(): Promise<void> {
+    await purgeVoxeetConference(this.props.onPurgeComplete);
+  }
+
   componentWillMount() {
     this.initConference();
   }
 
   componentWillUnmount() {
-    purgeVoxeetConference(this.props.onPurgeComplete);
+    // Do not purge voxeet session if prop enabled
+    if (!this.props.disablePurgeOnRemount) {
+      this.invokePurgeSession();
+    }
   }
 
   render() {
@@ -107,13 +121,13 @@ export class App extends React.Component<Props, State> {
     return (
       <ThemeProvider theme={theme}>
         <UserContext.Provider
-          value={{ attendee, onAttendeeAdd, onCallDisconnectCallback }}
+          value={{ attendee, onAttendeeAdd, onCallDisconnectCallback, mode }}
         >
           {conference && syncedData ? (
             <VoxeetContext.Provider value={{ conference }}>
               <DataSyncContext.Provider value={syncedData}>
                 <Box className={LivoAppContainer}>
-                  <ConferenceContainer mode={mode} />
+                  <ConferenceContainer />
                 </Box>
               </DataSyncContext.Provider>
             </VoxeetContext.Provider>

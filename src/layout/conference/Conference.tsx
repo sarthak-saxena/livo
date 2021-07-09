@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ConnectedUsers from "../ConnectedUsers";
 import CallPad from "../../components/Callpad";
 import { createUseStyles } from "react-jss";
@@ -6,10 +6,8 @@ import clsx from "clsx";
 import Column from "../../components/ui/Column";
 import { AttendeeList } from "../../components/AttendeeList";
 import Row from "../../components/ui/Row";
-import {
-  useOnResizeMediaCallback,
-  useResizeMediaObserver,
-} from "../../services/hooks/resizeMediaObserverHook";
+import { ConferenceMode } from "../../types/App";
+import { useAttendee } from "../../services/hooks/userHook";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   container: {
@@ -33,11 +31,9 @@ const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
 }));
 
 const Conference = ({ ...props }) => {
+  const { mode } = useAttendee();
   const classes = useStylesFromThemeFunction(props);
-  const [isSmallScreen, setSmallScreen] = useState(false);
-  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
-  useResizeMediaObserver(onResizeMediaCallback);
-
+  const isSmallScreen = mode === ConferenceMode.Background;
   return (
     <Row className={clsx(classes.container)}>
       <Column

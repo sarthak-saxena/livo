@@ -43,3 +43,8 @@ export enum VoxeetCommandType {
   RequestDataSync = "RequestDataSync",
   ResponseDataSync = "ResponseDataSync",
 }
+
+export enum ParticipantStatus {
+  Connected = "Connected",
+  Left = "Left",
+}

@@ -17,19 +17,28 @@ export const initializeVoxeet = async (
 ): Promise<Conference | undefined> => {
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
-    await VoxeetSdk.session.open({
-      name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
-      externalId: creator.id,
-    });
-    const conference = await createConference(room);
-    console.log("conference joined with participants", conference.participants);
+    const participant = VoxeetSdk.session.participant;
+    if (!participant) {
+      await VoxeetSdk.session.open({
+        name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
+        externalId: creator.id,
+      });
+      const conference = await createConference(room);
+      console.log(
+        "conference joined with participants",
+        conference.participants
+      );
 
-    // add event listeners for commanding
-    addEventlistenersForCommanding();
+      // add event listeners for commanding
+      addEventlistenersForCommanding();
 
-    // Important: disable mute initially for every attendee
-    controlMuteState(conference);
-    return conference;
+      // Important: disable mute initially for every attendee
+      controlMuteState(conference);
+      return conference;
+    } else {
+      console.log("Reusing existing Voxeet context");
+      return (VoxeetSdk.conference as unknown) as Conference;
+    }
   } catch (e) {
     console.error("Error in joining conference: " + e);
     throw e;
@@ -51,15 +60,18 @@ const controlMuteState = (conference: Conference) => {
 };
 
 export const purgeVoxeetSession = async () => {
-  await VoxeetSdk.session.close();
+  VoxeetSdk.session.participant && (await VoxeetSdk.session.close());
 };
 
 export const purgeVoxeetConference = async (onDestroy?: Function) => {
-  console.log("purging voxeet conference");
-  await VoxeetSdk.conference.leave({ leaveRoom: true });
-  await purgeVoxeetSession();
-  VoxeetSdk.command.off("received", commandListenerCallbacks);
-  onDestroy && onDestroy();
+  if (VoxeetSdk.conference) {
+    console.log("purging voxeet conference");
+    await VoxeetSdk.conference.leave({ leaveRoom: true });
+    await purgeVoxeetSession();
+    VoxeetSdk.command.off("received", commandListenerCallbacks);
+    localStorage.removeItem(LocalStorageKeys.muteState);
+    onDestroy && onDestroy();
+  }
 };
 
 const getConferenceId = async (room: Room): Promise<string> => {

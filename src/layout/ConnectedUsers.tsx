@@ -20,12 +20,8 @@ import Column from "../components/ui/Column";
 import Row from "../components/ui/Row";
 import { isCreator } from "../core/Utilities";
 import { useDataSync } from "../services/hooks/dataSyncHook";
-import {
-  useOnResizeMediaCallback,
-  useResizeMediaObserver,
-} from "../services/hooks/resizeMediaObserverHook";
 import { getVoxeetSessionParticipants } from "../core/voxeet/sdk";
-import VoxeetSdk from "@voxeet/voxeet-web-sdk";
+import { ConferenceMode } from "../types/App";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -152,7 +148,8 @@ const ConnectedUsers = ({ ...props }) => {
     syncedMicStatus,
     syncedHandsRaised,
   } = useSyncFromDataSync();
-  const [isSmallScreen, setSmallScreen] = useState(false);
+  const { onAttendeeAdd, attendee, mode } = useAttendee();
+  const isSmallScreen = mode === ConferenceMode.Background;
   const [speakers, setSpeakers] = useState(
     syncedSpeakers as { [id: string]: boolean }
   );
@@ -162,7 +159,7 @@ const ConnectedUsers = ({ ...props }) => {
   const [handsRaised, setHandsRaised] = useState(
     syncedHandsRaised as { [id: string]: boolean }
   );
-  const { onAttendeeAdd, attendee } = useAttendee();
+
   const [attendees, setAttendees] = useState([] as Participant[]);
   const onAttendeeAddCallback = useAttendeeAddCallback(attendees, setAttendees);
   const onGrantSpeakerAccessCallback = useOnGrantSpeakerAccessCallback(
@@ -186,9 +183,7 @@ const ConnectedUsers = ({ ...props }) => {
     micStatus,
     setMikeStatus
   );
-  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
-  useResizeMediaObserver(onResizeMediaCallback);
   useVoxeetStreamAdded(onAttendeeAddCallback, onAttendeeAdd);
   useOnGrantSpeakerAccess(onGrantSpeakerAccessCallback);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccessCallback);
@@ -201,11 +196,15 @@ const ConnectedUsers = ({ ...props }) => {
     const sync = () => {
       const attendees = Array.from(
         conference ? conference.participants.values() : []
-      ) as Participant[];
+      ).filter((p) => p.status === "Connected") as Participant[];
       setAttendees(attendees);
     };
     sync();
-    // Todo Fix hack - add logic for resync
+
+    /**
+     * Resync is required to get the latest updated participant state
+     * Participants will show up only if status is Connected
+     */
     setTimeout(sync, 1000);
   }, [conference]);
   return (
