@@ -108,7 +108,7 @@ export class App extends React.Component<Props, State> {
   }
 
   public async invokePurgeSession(): Promise<void> {
-    await purgeVoxeetConference(this.props.onPurgeComplete);
+    await purgeVoxeetConference();
   }
 
   componentWillMount() {
@@ -120,6 +120,7 @@ export class App extends React.Component<Props, State> {
     if (!this.props.disablePurgeOnRemount) {
       this.invokePurgeSession();
     }
+    this.props.onPurgeComplete();
   }
 
   render() {
