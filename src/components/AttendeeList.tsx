@@ -44,12 +44,15 @@ export const AttendeeList = ({ ...props }) => {
     const sync = () => {
       const attendees = Array.from(
         conference ? conference.participants.values() : []
-      ) as Participant[];
+      ).filter((p) => p.status === "Connected") as Participant[];
       setAttendees(attendees);
     };
     sync();
 
-    // Todo Fix hack - add logic for resync
+    /**
+     * Resync is required to get the latest updated participant state
+     * Participants will show up only if status is Connected
+     */
     setTimeout(sync, 1000);
   }, []);
 

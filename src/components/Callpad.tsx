@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   getVoxeetSessionParticipantId,
   invokeMuteAttendeeCommand,
+  invokeUnMuteAttendeeCommand,
   purgeVoxeetConference,
   raiseHandInConference,
   requestConferenceSpeakerAccess,
   toggleMuteAttendee,
-  invokeUnMuteAttendeeCommand,
   unRaiseHandInConference,
 } from "../core/voxeet/sdk";
 import Row from "./ui/Row";
@@ -34,11 +34,8 @@ import {
 import { Participant } from "@voxeet/voxeet-web-sdk/types/models/Participant";
 import { VoxeetCommandType } from "../types/Voxeet";
 import { useDataSync } from "../services/hooks/dataSyncHook";
-import {
-  useOnResizeMediaCallback,
-  useResizeMediaObserver,
-} from "../services/hooks/resizeMediaObserverHook";
 import { useMuteState } from "../services/hooks/muteStateHook";
+import { ConferenceMode } from "../types/App";
 
 const useStylesFromThemeFunction = createUseStyles((theme: any) => ({
   root: {
@@ -210,7 +207,7 @@ const CallPad = ({ ...props }) => {
     setHandRaised(value);
   };
 
-  const { attendee, onCallDisconnectCallback } = useAttendee();
+  const { attendee, onCallDisconnectCallback, mode } = useAttendee();
   const {
     setHandRaisedDefault,
     muteMikeDefault,
@@ -225,7 +222,7 @@ const CallPad = ({ ...props }) => {
     requestSpeakerAccessButtonEnabled,
     enableRequestSpeakerAccessButton,
   ] = useState(requestSpeakerAccessButtonEnabledDefault);
-  const [isSmallScreen, setSmallScreen] = useState(false);
+  const isSmallScreen = mode === ConferenceMode.Background;
   const { setMuteState } = useMuteState();
 
   const muteMikeCallback = useCallback(() => {
@@ -256,16 +253,12 @@ const CallPad = ({ ...props }) => {
   );
   const onMuteAttendeeCallback = useOnMuteAttendeeCallback(muteMike);
   const onUnMuteAttendeeCallback = useOnUnMuteAttendeeCallback(muteMike);
-  const onResizeMediaCallback = useOnResizeMediaCallback(setSmallScreen);
 
   useOnDenySpeakerAccess(onDenySpeakerAccessCallback);
   useOnGrantSpeakerAccess(onGrantSpeakerAccess);
   useOnRevokeSpeakerAccess(onRevokeSpeakerAccess);
   useOnMuteAttendee(onMuteAttendeeCallback);
   useOnUnMuteAttendee(onUnMuteAttendeeCallback);
-
-  useResizeMediaObserver(onResizeMediaCallback);
-
   return (
     <Row className={classes.root}>
       <Column className={clsx("is-two-thirds", classes.configWrapper)}>
