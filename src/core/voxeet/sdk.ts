@@ -251,7 +251,11 @@ export const addEventlistenersForCommanding = () => {
 };
 
 export const getVoxeetSessionParticipantId = () => {
-  return VoxeetSdk?.session?.participant?.id;
+  return (
+    VoxeetSdk.session &&
+    VoxeetSdk.session.participant &&
+    VoxeetSdk.session.participant.id
+  );
 };
 
 export const getVoxeetSessionParticipants = (): Participant[] => {
