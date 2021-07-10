@@ -18,6 +18,19 @@ export const initializeVoxeet = async (
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
     const participant = VoxeetSdk.session.participant;
+
+    /**
+     * if room id does not match
+     * - disconnect from current conference
+     * - start new conference
+     */
+    const currentConference = VoxeetSdk.conference.current;
+    if (currentConference) {
+      if (currentConference.alias !== room.id) {
+        await purgeVoxeetConference();
+      }
+    }
+
     if (!participant) {
       await VoxeetSdk.session.open({
         name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
@@ -251,7 +264,11 @@ export const addEventlistenersForCommanding = () => {
 };
 
 export const getVoxeetSessionParticipantId = () => {
-  return VoxeetSdk.session.participant.id;
+  return (
+    VoxeetSdk.session &&
+    VoxeetSdk.session.participant &&
+    VoxeetSdk.session.participant.id
+  );
 };
 
 export const getVoxeetSessionParticipants = (): Participant[] => {
