@@ -16,12 +16,8 @@ interface Props {
   onAppInitializedSuccessCallback?: (conference: Conference) => void;
   onAppInitializedErrorCallback?: (e: Error) => void;
   onCallDisconnectCallback?: Function;
-  onPurgeComplete?: Function
+  onPurgeComplete?: Function;
+  disablePurgeOnRemount?: boolean;
 }
 
-declare const Livo: ({
-  mode,
-  apiConfig,
-  attendee,
-  room,
-}: Props) => JSX.Element;
+declare const Livo: ({ mode, apiConfig, attendee, room }: Props) => JSX.Element;
