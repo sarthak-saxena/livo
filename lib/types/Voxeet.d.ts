@@ -37,4 +37,8 @@ export declare enum VoxeetCommandType {
     RequestDataSync = "RequestDataSync",
     ResponseDataSync = "ResponseDataSync"
 }
+export declare enum ParticipantStatus {
+    Connected = "Connected",
+    Left = "Left"
+}
 export {};
