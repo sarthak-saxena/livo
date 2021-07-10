@@ -17,8 +17,6 @@ export const initializeVoxeet = async (
 ): Promise<Conference | undefined> => {
   VoxeetSdk.initialize(config.consumerKey, config.consumerSecret);
   try {
-    const participant = VoxeetSdk.session.participant;
-
     /**
      * if room id does not match
      * - disconnect from current conference
@@ -30,7 +28,7 @@ export const initializeVoxeet = async (
         await purgeVoxeetConference();
       }
     }
-
+    const participant = VoxeetSdk.session.participant;
     if (!participant) {
       await VoxeetSdk.session.open({
         name: `${creator.name} ${creator.isConferenceCreator ? "(admin)" : ""}`,
