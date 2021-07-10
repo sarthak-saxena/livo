@@ -37,7 +37,8 @@
     "eject": "react-scripts eject",
     "prettier": "prettier --write '{src,test}/**/*.{js,ts,less,css,tsx,jsx}'",
     "copy-files": "cp ./src/styles ./lib/",
-    "postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose"
+    "postbuild": "gzipper compress ./build ./gzip_build --output-file-format [filename].[ext] --verbose",
+	"lib": "tsc -p libtsConfig.json && rsync -a lib/ && babel ./lib --out-dir ./lib --copy-files && mkdir ./lib/styles && cp ./src/styles/* ./lib/styles/"
   },
   "eslintConfig": {
     "extends": [
